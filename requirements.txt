@@ -1,0 +1,16 @@
+# corpus
+requests
+beautifulsoup4
+pymupdf
+
+# measurement
+tiktoken
+numpy
+pandas
+
+# embeddings
+sentence-transformers
+
+# notebook
+ipykernel
+ipywidgets
