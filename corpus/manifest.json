@@ -1,0 +1,52 @@
+[
+  {
+    "id": "kvkk_kanun_6698",
+    "title": "6698 sayılı Kişisel Verilerin Korunması Kanunu",
+    "kind": "kanun",
+    "source": "https://mevzuat.gov.tr/MevzuatMetin/1.5.6698.pdf",
+    "downloaded": "2026-10-01",
+    "pages": 21,
+    "words": 6165,
+    "chars": 47206
+  },
+  {
+    "id": "yonetmelik_silme_yok_etme_anonim",
+    "title": "Kişisel Verilerin Silinmesi, Yok Edilmesi veya Anonim Hale Getirilmesi Hakkında Yönetmelik",
+    "kind": "yonetmelik",
+    "source": "mevzuat.gov.tr (GeneratePdf)",
+    "downloaded": "2026-10-01",
+    "pages": 2,
+    "words": 1403,
+    "chars": 10523
+  },
+  {
+    "id": "teblig_aydinlatma",
+    "title": "Aydınlatma Yükümlülüğünün Yerine Getirilmesinde Uyulacak Usul ve Esaslar Hakkında Tebliğ",
+    "kind": "teblig",
+    "source": "mevzuat.gov.tr (GeneratePdf)",
+    "downloaded": "2026-10-01",
+    "pages": 2,
+    "words": 696,
+    "chars": 5626
+  },
+  {
+    "id": "rehber_veri_guvenligi",
+    "title": "Kişisel Veri Güvenliği Rehberi (Teknik ve İdari Tedbirler)",
+    "kind": "rehber",
+    "source": "https://www.kvkk.gov.tr/yayinlar/veri_guvenligi_rehberi.pdf",
+    "downloaded": "2026-10-01",
+    "pages": 47,
+    "words": 2804,
+    "chars": 23321
+  },
+  {
+    "id": "rehber_ozel_nitelikli",
+    "title": "Özel Nitelikli Kişisel Verilerin İşlenmesine İlişkin Rehber",
+    "kind": "rehber",
+    "source": "https://www.kvkk.gov.tr/SharedFolderServer/CMSFiles/70f95c73-06a2-44dc-81e9-34201bdd7f5c.pdf",
+    "downloaded": "2026-10-01",
+    "pages": 78,
+    "words": 10863,
+    "chars": 89476
+  }
+]
