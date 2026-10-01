@@ -1,0 +1,11 @@
+,type,question,e5-64/0,tr-64/0,e5-64/32,tr-64/32,e5-128/32,tr-128/32,e5-192/48,tr-192/48
+q001,paraphrase,Kişilerin verileri hangi durumlarda temizlenm,0.0,1.0,0.0,1.0,0.0,0.0,0.0,0.0
+q002,dogrudan,Açık rıza nedir?,0.0,0.0,1.0,0.0,1.0,1.0,1.0,0.0
+q003,senaryo,Müşteri hakkında hangi verileri tuttuğumuzu s,0.0,0.0,1.0,1.0,0.0,1.0,1.0,1.0
+q004,senaryo,"Sitemiz hacklendi, müşteri bilgileri sızdı. K",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+q005,paraphrase,Silinmesi gereken verileri en geç kaç ayda bi,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+q006,paraphrase,Kullanıcı sormasa da verileri ne için topladı,0.0,0.0,0.0,0.0,0.0,0.0,1.0,1.0
+q007,senaryo,KVKK onayıyla 'metni okudum' kutusunu tek che,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+q008,senaryo,Şifreleme key'ini .env'de tutmak sorun olur m,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+q009,paraphrase,Klavyede yazma ritmi hassas veri sayılır mı?,1.0,1.0,1.0,1.0,0.0,1.0,1.0,1.0
+q010,coklu,Müşteri verisini silmemi istedi ama kargo fir,1.0,1.0,0.0,1.0,1.0,1.0,1.0,1.0
