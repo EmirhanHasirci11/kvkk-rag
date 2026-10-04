@@ -67,10 +67,22 @@ From `results/test_v1_summary.csv`. Configuration frozen before the run, one run
 | hyb-e5+bm25 | 0.45 | 0.65 | 0.75 | 0.85 |
 | hyb-e5+tr+bm25 | 0.45 | 0.55 | 0.60 | 0.75 |
 
+## Combined results (dev + test combined, 50 q, 192/48)
+
+From `results/combined_50q.csv`, written by `scripts/eval_combined.py`. BM25 is computed on all 50 questions. The e5 and hybrid rows are the mean of the per-question values from `results/test_v1_per_question.csv` (30 dev + 20 test).
+
+| System | R@1 | R@3 | R@5 | R@10 |
+|---|---|---|---|---|
+| bm25-none | 0.18 | 0.26 | 0.30 | 0.42 |
+| bm25-prefix5 | 0.28 | 0.46 | 0.48 | 0.60 |
+| e5 | 0.31 | 0.49 | 0.59 | 0.73 |
+| hyb-e5+bm25 | 0.38 | 0.56 | 0.64 | 0.73 |
+
+BM25 R@10 is 0.42 without stemming and 0.60 with prefix5. `e5` and `hyb-e5+bm25` are tied at R@10 (0.73); the hybrid is ahead at R@1, R@3 and R@5. These numbers include the test questions that were also looked at when choosing the system (see Decision), so they are a summary, not an independent test.
+
 ## Findings
 
 - Stemming matters for BM25: `bm25-none` to `bm25-prefix5` raises R@10 from 0.30 to 0.50.
-- On all 50 questions (192/48), BM25 R@10 is 0.42 without stemming and 0.60 with prefix5.
 - On dev, hybrid retrieval improves the top ranks (R@1 0.22 to 0.33) but not R@10 (0.65 and 0.72 against 0.72 for e5 alone).
 - The R@1 gain did not repeat on test: all three systems score 0.45.
 - The three-way hybrid (e5 + tr + BM25) did not hold up on test: R@10 0.75 and R@5 0.60, against 0.85 and 0.75 for `hyb-e5+bm25`.

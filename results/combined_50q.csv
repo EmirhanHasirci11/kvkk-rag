@@ -1,0 +1,5 @@
+set,model,R@1,R@3,R@5,R@10
+dev+test,bm25-none,0.18,0.26,0.3,0.42
+dev+test,bm25-prefix5,0.28,0.46,0.48,0.6
+dev+test,e5,0.31,0.49,0.59,0.73
+dev+test,hyb-e5+bm25,0.38,0.56,0.64,0.73
