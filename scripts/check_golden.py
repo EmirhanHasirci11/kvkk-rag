@@ -1,6 +1,6 @@
-"""Validate eval/golden.jsonl against the corpus.
+"""Validate a question file (default eval/golden.jsonl) against the corpus.
 
-Run from the repo root: python scripts/check_golden.py
+Run from the repo root: python scripts/check_golden.py [eval/test.jsonl]
 """
 import json, re, sys
 from pathlib import Path
@@ -35,9 +35,10 @@ def words(s):
     return {w[:5] for w in re.findall(r"[a-zçğıöşüâîû]+", tr_lower(s)) if len(w) > 2 and w not in STOP}
 
 
+PATH = Path(sys.argv[1] if len(sys.argv) > 1 else "eval/golden.jsonl")
 corpus = {p.stem: norm(p.read_text(encoding="utf-8")) for p in Path("corpus/text").glob("*.txt")}
 errors, seen = 0, set()
-for n, line in enumerate(Path("eval/golden.jsonl").read_text(encoding="utf-8").splitlines(), 1):
+for n, line in enumerate(PATH.read_text(encoding="utf-8").splitlines(), 1):
     if not line.strip():
         continue
     try:

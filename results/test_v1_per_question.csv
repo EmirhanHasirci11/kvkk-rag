@@ -1,0 +1,51 @@
+id,type,question,e5 R@1,e5 R@3,e5 R@5,e5 R@10,hyb-e5+bm25 R@1,hyb-e5+bm25 R@3,hyb-e5+bm25 R@5,hyb-e5+bm25 R@10,hyb-e5+tr+bm25 R@1,hyb-e5+tr+bm25 R@3,hyb-e5+tr+bm25 R@5,hyb-e5+tr+bm25 R@10,set
+q001,paraphrase,Kişilerin verileri hangi durumlarda temizlenm,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,dev
+q002,dogrudan,Açık rıza nedir?,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,dev
+q003,dogrudan,Müşteri hakkında hangi verileri tuttuğumuzu s,0.0,1.0,1.0,1.0,0.0,1.0,1.0,1.0,0.0,1.0,1.0,1.0,dev
+q004,senaryo,"Sitemiz hacklendi, müşteri bilgileri sızdı. K",0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,dev
+q005,paraphrase,Silinmesi gereken verileri en geç kaç ayda bi,1.0,1.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,dev
+q006,paraphrase,Kullanıcı sormasa da verileri ne için topladı,0.0,1.0,1.0,1.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,dev
+q007,senaryo,KVKK onayıyla 'metni okudum' kutusunu tek che,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,dev
+q008,senaryo,Şifreleme key'ini .env'de tutmak sorun olur m,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,dev
+q009,paraphrase,Klavyede yazma ritmi hassas veri sayılır mı?,0.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,dev
+q010,coklu,Müşteri verisini silmemi istedi ama kargo fir,0.0,1.0,1.0,1.0,0.0,0.0,1.0,1.0,0.0,1.0,1.0,1.0,dev
+q011,paraphrase,verileri farklı bir ülkede saklamak,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.0,1.0,1.0,1.0,dev
+q012,paraphrase,Veri sızıntısı sonucu zararın karşılanması,0.0,0.0,0.0,0.0,0.0,0.0,1.0,1.0,0.0,0.0,0.0,1.0,dev
+q013,senaryo,yeni şirket veri toplamak için nereye başvuru,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,1.0,1.0,dev
+q014,senaryo,yakın çevrenin bilgilerinin telefonda barındı,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,dev
+q015,paraphrase,verileri nasıl yok ederim,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,dev
+q016,paraphrase,Silinen verilerin kaydı tutulmalı mı,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,dev
+q017,paraphrase,Kullanıcıları bilgilendirdiğimizi kim kanıtla,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,dev
+q018,senaryo,İnternet depolarında bilgi kaydederken nelere,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,dev
+q019,senaryo,Çalışanların yaptığı işlemleri belli bir yerd,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,dev
+q020,senaryo,Personel kartlarına fotoğraf eklemek hassas v,0.0,0.0,0.0,1.0,0.0,1.0,1.0,1.0,0.0,1.0,1.0,1.0,dev
+q021,senaryo,Şirket başvuruya cevap vermezse veya beni tat,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,dev
+q022,paraphrase,Veri güvenliği şartlarına uymazsam ceza var m,0.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,dev
+q023,paraphrase,Sözleşme için aldığım veriyi işlemek için izi,0.0,1.0,1.0,1.0,0.0,1.0,1.0,1.0,0.0,1.0,1.0,1.0,dev
+q024,senaryo,İş yerinden ayrıldıktan sonra şirketteki veri,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,1.0,1.0,dev
+q025,dogrudan,"Verileri anonimleştirme, gizleme ne demek?",0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,dev
+q026,senaryo,Biri şirketten ayrılırsa bilgileri ile ne yap,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,dev
+q027,paraphrase,Veri yedeklerine kimler ulaşabilir?,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,dev
+q028,paraphrase,Bulut üyeliği bittiğinde şifreleme anahtarlar,0.0,1.0,1.0,1.0,0.0,1.0,1.0,1.0,0.0,1.0,1.0,1.0,dev
+q029,senaryo,Veriyi kullanıcıya onaylattığımdan farklı bir,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,dev
+q030,coklu,Verileri farklı firmaya devrettiğimde bütün g,0.5,0.5,0.5,0.5,0.0,0.0,0.0,0.5,0.0,0.0,0.5,0.5,dev
+q031,senaryo,İleride lazım olur diye ihtiyacımızdan fazla ,0.0,1.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,test
+q032,paraphrase,Birinin hasta olma ihtimali varsa bu bir sağl,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,test
+q033,dogrudan,Özel verilere hangi örnekler verilebilir?,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,test
+q034,paraphrase,Teşhis ve tedavi amacıyla veriler işlenebilir,0.0,0.0,1.0,1.0,0.0,1.0,1.0,1.0,0.0,0.0,1.0,1.0,test
+q035,paraphrase,Verinin neden toplandığını belirtmeli miyim?,0.0,0.0,1.0,1.0,0.0,0.0,1.0,1.0,0.0,1.0,1.0,1.0,test
+q036,senaryo,Otomatik sistem aleyhime bir karar verirse ip,0.0,0.0,0.0,0.0,0.0,1.0,1.0,1.0,0.0,0.0,0.0,0.0,test
+q037,senaryo,"Bir bilgimi yanlış kaydetmişler, ne yapabilir",0.0,0.0,0.0,0.0,0.0,0.0,1.0,1.0,0.0,0.0,0.0,0.0,test
+q038,paraphrase,Başvururken herhangi bir ücret ödeyecek miyim,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,test
+q039,senaryo,Başvuruyu telefonla yapsam geçerli olur mu?,0.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,test
+q040,senaryo,Anonim verilerle araştırma yapsam ceza yer mi,0.0,0.0,0.0,1.0,0.0,1.0,1.0,1.0,0.0,0.0,0.0,1.0,test
+q041,senaryo,"Küçük bir şirketiz, saklama politikamız yok. ",1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,test
+q042,paraphrase,Kullanıcıya genel bilgiler versem yeterli mi?,0.0,0.0,1.0,1.0,0.0,1.0,1.0,1.0,0.0,0.0,0.0,1.0,test
+q043,senaryo,Aydınlatma metnini hukuki terimlerle dolu yaz,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.0,1.0,1.0,1.0,test
+q044,senaryo,Verileri yöneten kişiye tüm yetkileri versem ,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,test
+q045,paraphrase,Veri güvenliği için antivirüs yeterli mi?,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,test
+q046,paraphrase,İnternetten gelebilecek saldırılara karşı nas,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,test
+q047,paraphrase,Veriler hakkında çalışanlara ne öğretilmeli?,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,test
+q048,senaryo,Basılı belgeleri ve harici diskleri nasıl sak,1.0,1.0,1.0,1.0,0.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,test
+q049,coklu,Hassas veriyle çalışanlar nelere dikkat etmel,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,test
+q050,senaryo,Servis şoförlerimizden sabıka kaydı ve sağlık,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,test
