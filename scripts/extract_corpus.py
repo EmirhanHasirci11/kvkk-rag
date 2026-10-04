@@ -8,7 +8,8 @@ DOCS = [
  dict(id="kvkk_kanun_6698", file="kvkk_kanun_6698.pdf",
       title="6698 sayılı Kişisel Verilerin Korunması Kanunu",
       source="https://mevzuat.gov.tr/MevzuatMetin/1.5.6698.pdf", kind="kanun",
-      skip_pages=[21], cut=[("(I) SAYILI CETVEL", None)]),
+      skip_pages=[21], cut=[("(I) SAYILI CETVEL", None)],
+      min_ratio=0.95),  # amendment footnotes are 11pt, body is 12pt
  dict(id="yonetmelik_silme_yok_etme_anonim", file="yonetmelik_silme_yok_etme_anonim.pdf",
       title="Kişisel Verilerin Silinmesi, Yok Edilmesi veya Anonim Hale Getirilmesi Hakkında Yönetmelik",
       source="mevzuat.gov.tr (GeneratePdf)", kind="yonetmelik", skip_pages=[],
