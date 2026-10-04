@@ -70,6 +70,7 @@ From `results/test_v1_summary.csv`. Configuration frozen before the run, one run
 ## Findings
 
 - Stemming matters for BM25: `bm25-none` to `bm25-prefix5` raises R@10 from 0.30 to 0.50.
+- On all 50 questions (192/48), BM25 R@10 is 0.42 without stemming and 0.60 with prefix5.
 - On dev, hybrid retrieval improves the top ranks (R@1 0.22 to 0.33) but not R@10 (0.65 and 0.72 against 0.72 for e5 alone).
 - The R@1 gain did not repeat on test: all three systems score 0.45.
 - The three-way hybrid (e5 + tr + BM25) did not hold up on test: R@10 0.75 and R@5 0.60, against 0.85 and 0.75 for `hyb-e5+bm25`.
