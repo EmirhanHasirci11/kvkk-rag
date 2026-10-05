@@ -11,6 +11,10 @@ pandas
 # embeddings
 sentence-transformers
 
+# generation
+google-genai
+python-dotenv
+
 # notebook
 ipykernel
 ipywidgets

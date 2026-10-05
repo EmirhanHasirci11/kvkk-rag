@@ -13,6 +13,7 @@ from sentence_transformers import SentenceTransformer
 from bm25 import BM25
 from chunking import chunk_words
 from fusion import rrf
+from sections import chunk_sections
 from textproc import tokenize
 
 MODEL_NAME = "intfloat/multilingual-e5-base"
@@ -25,7 +26,9 @@ class HybridRetriever:
         self.depth = depth
         self.k_rrf = k_rrf
         # chunk each document separately so no chunk mixes two documents
-        self.chunks = [{"doc": doc, "text": c} for doc, t in texts.items() for c in chunk_words(t, size, overlap)]
+        self.chunks = [{"doc": doc, "text": c, **meta}
+                       for doc, t in texts.items()
+                       for c, meta in zip(chunk_words(t, size, overlap), chunk_sections(t, size, overlap), strict=True)]
         self.model = SentenceTransformer(MODEL_NAME)
         self.vecs = self.model.encode(["passage: " + c["text"] for c in self.chunks],
                                       normalize_embeddings=True, batch_size=32, show_progress_bar=False)
@@ -36,5 +39,7 @@ class HybridRetriever:
         dense = np.argsort(-(self.vecs @ q))[:self.depth].tolist()    # cosine similarity, vectors are normalized
         sparse = [i for i, _ in self.bm25.search(tokenize(query, STEM), k=self.depth)]
         fused = rrf([dense, sparse], k=self.k_rrf, top=k)
-        return [{"doc": self.chunks[i]["doc"], "text": self.chunks[i]["text"], "rank": r}
+        # section: article / guide section at the chunk's first word, sections: all it covers
+        return [{"doc": self.chunks[i]["doc"], "section": self.chunks[i]["section"],
+                 "sections": self.chunks[i]["sections"], "text": self.chunks[i]["text"], "rank": r}
                 for r, i in enumerate(fused, 1)]

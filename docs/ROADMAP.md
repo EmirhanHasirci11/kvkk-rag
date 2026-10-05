@@ -10,7 +10,7 @@
      "MADDE n" or section number forward when a chunk starts mid-article.
    - Prompt rules: answer only from the given chunks, cite as [doc, Madde n],
      say "Bu konuda verilen metinlerde bilgi yok" when the chunks don't answer it.
-   - LLM choice: OPEN DECISION, ask the user first. Constraint: free or near-free.
+   - LLM: Gemini Flash via Google AI Studio API key (prepaid, paid tier; free-tier data is used for training). Code-level budget cap: $8.
      Keep the LLM behind one small interface so it can be swapped.
    - Deliverable: scripts/answer.py (CLI: python scripts/answer.py "soru")
 2. Answer evaluation
