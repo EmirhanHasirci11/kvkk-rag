@@ -39,7 +39,7 @@ Word counts, page counts and source URLs are in `manifest.json`.
 - **Chunking:** fixed-size word chunks, cut per document. 192 words with 48 overlap was the best of the four configurations tried (64/0, 64/32, 128/32, 192/48) on R@3, R@5 and R@10, but not on R@1.
 - **Models:** `intfloat/multilingual-e5-base` (`query: ` and `passage: ` prefixes) and `trmteb/turkish-embedding-model`, cosine similarity.
 - **BM25:** written from scratch in `scripts/bm25.py` (k1 = 1.5, b = 0.75). Tokens are Turkish-lowercased words. `bm25-none` uses them as they are; `bm25-prefix5` cuts each word to its first 5 letters as a crude stemmer.
-- **Hybrid:** Reciprocal Rank Fusion (k = 60). Each retriever passes its top 50 candidates, the fused list is cut to 10.
+- **Hybrid:** Reciprocal Rank Fusion (k = 60). Each retriever passes its top 50 candidates, the fused list is cut to 10. In all hybrid runs, the BM25 side is bm25-prefix5 (first 5 letters stemming). bm25-none is never used in a hybrid.
 
 Code: `scripts/retriever.py` (`HybridRetriever`), `scripts/eval_retriever.py`, notebooks `01` (dev experiments) and `02` (held-out test). Raw numbers are in `results/`.
 
