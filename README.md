@@ -99,3 +99,5 @@ BM25 R@10 is 0.42 without stemming and 0.60 with prefix5. `e5` and `hyb-e5+bm25`
 - The test questions were written evidence-first, and every system scores higher on test than on dev. Absolute numbers are not comparable across the two sets.
 - Verbatim-evidence recall checks that the labeled sentence is in the top-k chunks. It does not measure whether an answer would be correct, and other passages that support an answer are not counted.
 - Concept gaps are not solved. q007 and q014 describe a situation without using the legal terms, and neither BM25 nor the embeddings bridge that.
+
+Roadmap: see docs/ROADMAP.md
