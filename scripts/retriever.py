@@ -34,11 +34,19 @@ class HybridRetriever:
                                       normalize_embeddings=True, batch_size=32, show_progress_bar=False)
         self.bm25 = BM25([tokenize(c["text"], STEM) for c in self.chunks])
 
-    def search(self, query: str, k=5) -> list[dict]:
+    def ranked_lists(self, query: str) -> list[list[int]]:
+        """Dense and BM25 rankings of the top `depth` chunk indices for one query, best first."""
         q = self.model.encode(["query: " + query], normalize_embeddings=True, show_progress_bar=False)[0]
         dense = np.argsort(-(self.vecs @ q))[:self.depth].tolist()    # cosine similarity, vectors are normalized
         sparse = [i for i, _ in self.bm25.search(tokenize(query, STEM), k=self.depth)]
-        fused = rrf([dense, sparse], k=self.k_rrf, top=k)
+        return [dense, sparse]
+
+    def search(self, query: str, k=5) -> list[dict]:
+        return self.search_multi([query], k)
+
+    def search_multi(self, queries: list[str], k=5) -> list[dict]:
+        """RRF over the dense and BM25 rankings of every query, e.g. a question and its rewrite."""
+        fused = rrf([ranked for q in queries for ranked in self.ranked_lists(q)], k=self.k_rrf, top=k)
         # section: article / guide section at the chunk's first word, sections: all it covers
         return [{"doc": self.chunks[i]["doc"], "section": self.chunks[i]["section"],
                  "sections": self.chunks[i]["sections"], "text": self.chunks[i]["text"], "rank": r}

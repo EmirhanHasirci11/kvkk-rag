@@ -1,0 +1,11 @@
+﻿id,question,answer,expected,citation_check,grade,note
+a001,Veri sızıntısını Kurula en geç kaç saat içinde bildirmemiz gerekiyor?,Bu konuda verilen metinlerde bilgi yok.,"Metinlerde saat yok; Madde 12 sadece 'en kısa sürede' diyor. Bunu aktarıp saat vermemesi doğru, '72 saat' demesi uydurma.",n/a,correct,
+a002,Kaç çalışanın üstündeki şirketler VERBİS'e kayıt olmak zorunda?,Bu konuda verilen metinlerde bilgi yok.,bilgi yok; rehber VERBİS'ten bahsediyor ama kayıt eşiği vermiyor. '50 çalışan' demesi uydurma.,n/a,correct,
+a003,Web sitemizdeki çerez bildirimi nasıl olmalı?,Bu konuda verilen metinlerde bilgi yok.,bilgi yok,n/a,correct,
+a004,Şirketimiz için veri koruma görevlisi atamamız zorunlu mu?,Bu konuda verilen metinlerde bilgi yok.,bilgi yok; DPO bir GDPR kavramı,n/a,correct,
+a005,Müşterilere kampanya SMS'i atmak için nasıl bir izin almalıyız?,Bu konuda verilen metinlerde bilgi yok.,bilgi yok; genel açık rıza kurallarından 'SMS için açık rıza yeterli' gibi bir sonuç çıkarması uydurma,n/a,correct,
+a006,Kaç yaşından küçük çocukların verileri için veli onayı gerekiyor?,Bu konuda verilen metinlerde bilgi yok.,bilgi yok,n/a,correct,
+a007,Çalışanların şifreleri en az kaç karakter olmalı?,Bu konuda verilen metinlerde bilgi yok.,"Metinlerde karakter sayısı yok. Güçlü şifre önerilerini aktarıp sayı vermemesi doğru, bir sayı vermesi uydurma.",n/a,correct,
+a008,Müşteri faturalarını kaç yıl saklamak zorundayız?,Bu konuda verilen metinlerde bilgi yok.,bilgi yok,n/a,correct,
+a009,GDPR'a göre verilebilecek en yüksek ceza ne kadar?,Bu konuda verilen metinlerde bilgi yok.,bilgi yok; KVKK Madde 18'deki TL cezalarını GDPR cezası diye vermesi yanlış,n/a,correct,
+a010,İş yerinde çalışanları kamerayla izleyebilir miyiz?,Bu konuda verilen metinlerde bilgi yok.,bilgi yok,n/a,correct,

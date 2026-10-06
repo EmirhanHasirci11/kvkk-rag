@@ -3,6 +3,7 @@
 Run from the repo root:
     python scripts/run_answers.py [--ids q004 q007] [--tag v0]
     python scripts/run_answers.py --questions eval/abstention.jsonl --tag abstention_v0
+    python scripts/run_answers.py --rewrite --tag v1    (reuses results/rewrites_v1.jsonl)
 
 Writes results/answers_<tag>.jsonl and results/answers_<tag>_grading.csv and refuses to
 overwrite them. citation_check: "pass" when every gold fact (any alternative) is contained
@@ -37,13 +38,35 @@ def evidence_text(fact_list: list[list[str]]) -> str:
     return " | ".join(" / ".join(alts) for alts in fact_list)
 
 
+def cached_rewrite(g: dict, cache: Path, rewrites: dict) -> dict:
+    """Rewrite from the cache file, or a new LLM call that is appended to it."""
+    if g["id"] not in rewrites:
+        from rewrite import rewrite
+        out = rewrite(g["question"])
+        rewrites[g["id"]] = {"id": g["id"], "question": g["question"], "rewrite": out["text"],
+                             "input_tokens": out["input_tokens"], "output_tokens": out["output_tokens"],
+                             "cost_usd": out["cost_usd"]}
+        with cache.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(rewrites[g["id"]], ensure_ascii=False) + "\n")
+    rw = rewrites[g["id"]]
+    assert rw["question"] == g["question"], f"{g['id']}: cached rewrite is for a different question"
+    return rw
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser()
     parser.add_argument("--questions", default="eval/golden.jsonl", help="question file, relative to the repo root")
     parser.add_argument("--ids", nargs="+", help="run only these question ids")
     parser.add_argument("--tag", default="v0", help="output file suffix")
+    parser.add_argument("--rewrite", action="store_true",
+                        help="also search with the LLM rewrite of each question, cached in results/rewrites_<tag>.jsonl")
     args = parser.parse_args()
+
+    cache = ROOT / f"results/rewrites_{args.tag}.jsonl"
+    rewrites = {}
+    if args.rewrite and cache.exists():
+        rewrites = {r["id"]: r for r in map(json.loads, cache.read_text(encoding="utf-8").splitlines())}
 
     out_jsonl = ROOT / f"results/answers_{args.tag}.jsonl"
     out_csv = ROOT / f"results/answers_{args.tag}_grading.csv"
@@ -59,7 +82,10 @@ def main():
     rows, errors = [], []
     for g in questions:
         try:
-            r = answer(g["question"], retriever)
+            rw = cached_rewrite(g, cache, rewrites) if args.rewrite else None
+            r = answer(g["question"], retriever, rewritten=rw["rewrite"] if rw else None)
+            if rw:
+                r["rewrite_cost_usd"] = rw["cost_usd"]
         except BudgetExceeded as e:
             # every later call would fail the same way
             errors += [(q["id"], str(e)) for q in questions[questions.index(g):]]
@@ -100,7 +126,7 @@ def main():
         print(f"citation check pass: {passed}/{len(checked)} = {passed / len(checked):.2f}")
     if done:
         print(f"'bilgi yok' answers: {sum(r['no_info'] for r in done)}")
-        print(f"run cost: ${sum(r['cost_usd'] for r in done):.4f}")
+        print(f"answer cost: ${sum(r['cost_usd'] for r in done):.4f} (rewrites are logged in llm_usage.csv)")
     print(f"total spent: ${spent_usd():.4f} / ${BUDGET_USD:.2f}")
     if errors:
         print("errors:")

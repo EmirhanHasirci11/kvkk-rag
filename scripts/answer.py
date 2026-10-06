@@ -1,6 +1,7 @@
 """Answer a question from the KVKK corpus: HybridRetriever top-5 chunks -> LLM -> Turkish answer with citations.
 
-Run from the repo root: python scripts/answer.py "soru" [--dry-run]
+Run from the repo root: python scripts/answer.py "soru" [--rewrite] [--dry-run]
+--rewrite also searches with an LLM rewrite of the question (scripts/rewrite.py).
 --dry-run prints the prompt and makes no LLM call.
 """
 import argparse
@@ -62,11 +63,12 @@ def load_retriever():
     return HybridRetriever(texts)
 
 
-def answer(question: str, retriever, k=TOP_K) -> dict:
+def answer(question: str, retriever, k=TOP_K, rewritten: str | None = None) -> dict:
+    """rewritten: optional rewrite of the question, used only as an extra search query (RRF with the question)."""
     from llm import MODEL, generate
-    chunks = retriever.search(question, k=k)
+    chunks = retriever.search_multi([question] + ([rewritten] if rewritten else []), k=k)
     out = generate(build_prompt(question, chunks), SYSTEM)
-    return {"question": question, "model": MODEL, "retrieved": chunks, "answer": out["text"],
+    return {"question": question, "rewrite": rewritten, "model": MODEL, "retrieved": chunks, "answer": out["text"],
             "citations": parse_citations(out["text"], chunks), "no_info": is_no_info(out["text"]),
             "input_tokens": out["input_tokens"], "output_tokens": out["output_tokens"], "cost_usd": out["cost_usd"]}
 
@@ -75,6 +77,7 @@ def main():
     sys.stdout.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser()
     parser.add_argument("question")
+    parser.add_argument("--rewrite", action="store_true", help="also search with an LLM rewrite of the question")
     parser.add_argument("--dry-run", action="store_true", help="print the prompt, do not call the LLM")
     args = parser.parse_args()
 
@@ -84,7 +87,12 @@ def main():
         return
 
     from llm import BUDGET_USD, spent_usd
-    r = answer(args.question, retriever)
+    rw = None
+    if args.rewrite:
+        from rewrite import rewrite
+        rw = rewrite(args.question)
+        print(f"Arama sorgusu: {rw['text']}  (${rw['cost_usd']:.5f})\n")
+    r = answer(args.question, retriever, rewritten=rw["text"] if rw else None)
     print(r["answer"].strip(), "\n")
     print("Kaynaklar:")
     for c in r["citations"]:
