@@ -197,4 +197,42 @@ v0 -> v1: q001, q030, q031, q048, q049 became correct; q012, q019, q050 became "
 - All 50 golden questions had been seen before, and `fuse` was picked on them. The held-out check is step 6.
 - Every rewrite is one extra LLM call per question (about $0.003).
 
+
+# Prompt v1
+
+## Setup
+
+In v1, 5 of the 15 "bilgi yok" answers had the evidence in the top-5. Most of them asked about a concrete case the texts don't name (".env", "by phone", "staff ID photos") while a general rule in the chunks covers it, and the v0 prompt ("answer only from the texts, no interpretation") made the model abstain.
+
+The v1 prompt (`PROMPTS["v1"]` in `scripts/answer.py`) adds: if a general rule in the texts covers the concrete case, quote it with its citation and say that the case itself is not regulated separately, adding no conclusion, number or period beyond the rule; answer the part of a question the texts cover; say "bilgi yok" only when the texts have no related rule, definition or explanation.
+
+Retrieval is the same as v1 (`fuse`, same cached rewrites; the retrieved chunks are identical for every question), so only the prompt changes.
+
+Code: `python scripts/run_answers.py --rewrite --rewrites results/rewrites_v1.jsonl --prompt v1 --tag v2`.
+
+## Results
+
+| | v1 (prompt v0) | v2 (prompt v1) |
+|---|---|---|
+| Golden, correct (user graded) | 35 / 50 | 43 / 50 |
+| Golden, "bilgi yok" | 15 | 6 |
+| Golden, citation check pass | 30 | 35 |
+| Abstention, correct (user graded) | 10 / 10 | 10 / 10 |
+| Abstention, plain "bilgi yok" | 10 | 4 |
+
+v1 -> v2: q008, q012, q013, q019, q020, q026, q039 and q044 became correct; no question went from correct to wrong. All 6 remaining "bilgi yok" answers are retrieval misses (q004, q005, q007, q014, q024, q029). q050 is answered but wrong: it lists general rules on special-category data and misses the guide's conclusion.
+
+On the abstention set, 6 answers now quote a related rule instead of a plain "bilgi yok" (a001: Madde 12 "en kısa sürede"; a007: the password advice; a008: the guide's criteria for retention periods), each saying the asked number or case is not in the texts. None invents a number, deadline or threshold; every quoted rule was checked against the corpus.
+
+## Findings
+
+- The prompt fixed the abstentions it targeted: with the same chunks, correct answers go from 35 to 43 and the remaining failures are all retrieval misses plus one weak answer.
+- Being less conservative did not lead to invented answers on the abstention set.
+- Side effects: 10 answers that were already correct now add an unneeded "bu somut durum ayrıca düzenlenmemiştir" line, and q050 cites `[rehber_ozel_nitelikli, başlık öncesi]`. "başlık öncesi" is the chunk header's label for text before the first heading, not a real section; the header wording should change in the next prompt version.
+
+## Limitations
+
+- The v1 prompt was written after reading the failures on these same 50 questions, so 43 / 50 is an optimistic number. The held-out check is step 6.
+- The grading counts an answer as correct when it answers from a valid cited rule, even if it is not the gold passage (q026, q044). A stricter grader would score some of these as partial.
+
 Roadmap: see docs/ROADMAP.md
