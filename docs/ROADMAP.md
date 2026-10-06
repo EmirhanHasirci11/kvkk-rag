@@ -7,7 +7,8 @@
 - Step 3 Query rewriting: fuse (question + rewrite) (v1: 35/50); prompt v1 (v2: 43/50)
 - Step 4 Reranker: bge-reranker-v2-m3 on the top-30 (v3: 47/50)
 - Step 5 Stemming: bm25-snow replaces bm25-p5 (v4: 49/50)
-- Step 6 prepared: scripts/run_heldout.py freezes v4 and the v0 baseline; waiting for the new questions
+- Step 6 Final held-out test (20 + 5 new q): final 12/20 vs baseline 9/20; abstention 5/5 both.
+  Every wrong final answer is a retrieval miss; rw-only retrieval (R@5 0.70) beat the final (0.55)
 
 ## Next steps (in order)
 1. Generation v0

@@ -357,4 +357,57 @@ v3 -> v4: q014 now quotes the Madde 28 exemption for personal and household use;
 - The gain is at the threshold of what this set can show, and the questions are not held out.
 - zeyrek's first analysis is often not the right lemma ("Kurula" -> "kurulamak"); a disambiguation step might change its numbers.
 
+
+# Final held-out test
+
+## Setup
+
+- **Questions:** `eval/test_v2.jsonl`, 20 new questions (q051-q070), and `eval/abstention_v2.jsonl`, 5 new out-of-corpus questions (a011-a015). Both were committed before the run (`53f42bb`, `b364e42`).
+- **How they were made:** evidence sentences were drawn at random (seed 2026) from sections that no golden question uses; fragments, headings, case law, Kurum organisation articles and second sentences from an already used section were skipped by a rule fixed before drawing. Claude drafted one everyday-language question per sentence, and the user rewrote every question in their own words (typos kept). The abstention questions are Claude's drafts.
+- **Frozen pipeline** (`scripts/run_heldout.py`): final = v4 (`fuse` top-30 -> bge rerank -> top-5, `bm25-snow`, prompt v1); baseline = v0 (question alone, hybrid top-5, `bm25-p5`, prompt v0). One run; the script refuses a second run with the same tag and records the commit in `results/heldout_v2_config.json`.
+- **Grading:** by the user, same rule as before.
+
+## Retrieval (20 q)
+
+From `results/heldout_v2_retrieval_summary.csv`.
+
+| System | R@1 | R@3 | R@5 | R@10 |
+|---|---|---|---|---|
+| orig | 0.15 | 0.30 | 0.35 | 0.65 |
+| rw-only | 0.50 | 0.65 | 0.70 | 0.75 |
+| fuse | 0.20 | 0.55 | 0.60 | 0.70 |
+| orig + bge | 0.30 | 0.50 | 0.55 | 0.70 |
+| fuse + bge | 0.30 | 0.50 | 0.55 | 0.70 |
+| fuse + bge + snow (final) | 0.30 | 0.50 | 0.55 | 0.75 |
+
+## Answers
+
+| | v0 (baseline) | final (v4) |
+|---|---|---|
+| Held-out, correct (user graded) | 9 / 20 | 12 / 20 |
+| Held-out, "bilgi yok" | 10 | 3 |
+| Held-out abstention, correct | 5 / 5 | 5 / 5 |
+| Golden set (seen), correct | 33 / 50 | 49 / 50 |
+
+v0 -> final: q051, q054, q055, q057 and q059 became correct; q052 and q068 went from correct to wrong.
+
+In the final system, all 11 questions whose evidence was in the top-5 were answered correctly. All 8 wrong answers had no evidence in the top-5: 3 say "bilgi yok" (q056, q064, q069) and 5 answer from general rules and miss the rule that answers them (q052, q058, q062, q065, q068). q054 is correct without its evidence in the top-5.
+
+On the 5 new abstention questions the final system says "bilgi yok" once and quotes a related general rule 4 times, each time saying the asked case is not in the texts; nothing is invented.
+
+## Findings
+
+- The 50-question numbers were optimistic. Final accuracy drops from 49 / 50 on the questions used to build the system to 12 / 20 on new ones; the baseline drops less (33 / 50 to 9 / 20).
+- The final system still beats the baseline by 3 questions (+0.15), with 2 questions lost. With n = 20 that is a modest gain, not a decisive one.
+- Generation is not the problem on new questions: when the evidence is retrieved, the answer is right (11 of 11). Retrieval is.
+- The reranker did not carry over: it lifted R@5 from 0.71 to 0.80 on the golden set but lowers it from 0.60 to 0.55 here. The LLM rewrite did carry over: `rw-only` has the best R@5 (0.70, against 0.35 for the question alone).
+- No invented answers on any abstention question, seen or new.
+
+## Limitations
+
+- n = 20: one question is worth 0.05.
+- The questions are evidence-first (sampled sentence, then question), drafted by Claude and rewritten by the user, not written cold by a user.
+- 12 of the 20 evidence sentences come from the special-category guide, because most unused sentences are there; the communiqué has none.
+- By the project rule, nothing is changed after this result. `rw-only` looking better here is a finding for the next version, which would need its own new held-out set.
+
 Roadmap: see docs/ROADMAP.md
