@@ -290,12 +290,71 @@ v2 -> v3: q004, q005, q024 and q050 became correct; no question went from correc
 | v1 | fuse (rewrite) | v0 | 35 / 50 |
 | v2 | fuse | v1 | 43 / 50 |
 | v3 | fuse + bge rerank | v1 | 47 / 50 |
+| v4 | fuse + bge rerank, bm25-snow | v1 | 49 / 50 |
 
-Abstention set: 10 / 10 in every version.
+Abstention set: 10 / 10 in every version. v4 is described under Stemming below.
 
 ## Limitations
 
 - The setup and the adoption rule were fixed before the run and nothing was tuned, but `fuse` was chosen and the v1 prompt was written on these same 50 questions. 47 / 50 is not a held-out number; step 6 is.
 - The grading counts an answer as correct when it answers from a valid cited rule, even if it is not the gold passage.
+
+
+# Stemming
+
+## Setup
+
+Fixed before the first run (docstring of `scripts/eval_stemming.py`):
+
+- **Stemmers:** `bm25-none` (no stemming), `bm25-p5` (first 5 letters, the `bm25-prefix5` used so far), `bm25-snow` (Turkish Snowball, `snowballstemmer`), `bm25-zeyrek` (lemma from `zeyrek`, a Python port of Zemberek; it has no disambiguation, so the lemma of its first analysis is used and unknown words stay as they are).
+- **Levels:** BM25 alone; the `orig` hybrid (e5 + BM25); the pipeline, `fuse` top-30 -> bge rerank.
+- **Adoption rule:** a stemmer replaces p5 only if it raises the pipeline R@5 by at least 0.06 (3 questions).
+- **Check:** the p5 rows reproduce `results/rerank_v1_per_question.csv`.
+
+Code: `scripts/textproc.py`, `scripts/eval_stemming.py`. Raw numbers in `results/stemming_v1_*`.
+
+## Results (50 q)
+
+| Level | Stemmer | R@1 | R@3 | R@5 | R@10 | R@30 |
+|---|---|---|---|---|---|---|
+| BM25 alone | bm25-none | 0.18 | 0.26 | 0.30 | 0.42 | 0.64 |
+| | bm25-p5 | 0.28 | 0.46 | 0.48 | 0.60 | 0.81 |
+| | bm25-snow | 0.30 | 0.42 | 0.52 | 0.60 | 0.77 |
+| | bm25-zeyrek | 0.28 | 0.44 | 0.52 | 0.62 | 0.75 |
+| Hybrid (orig) | bm25-none | 0.18 | 0.36 | 0.48 | 0.63 | 0.90 |
+| | bm25-p5 | 0.38 | 0.56 | 0.64 | 0.73 | 0.87 |
+| | bm25-snow | 0.36 | 0.56 | 0.65 | 0.71 | 0.87 |
+| | bm25-zeyrek | 0.40 | 0.60 | 0.66 | 0.73 | 0.87 |
+| Pipeline (fuse + bge) | bm25-none | 0.54 | 0.72 | 0.82 | 0.88 | 0.94 |
+| | bm25-p5 | 0.52 | 0.73 | 0.80 | 0.88 | 0.96 |
+| | bm25-snow | 0.52 | 0.72 | 0.86 | 0.90 | 0.96 |
+| | bm25-zeyrek | 0.54 | 0.73 | 0.84 | 0.88 | 0.94 |
+
+R@30 is the candidate pool before reranking (for the pipeline, the `fuse` top-30).
+
+Pipeline at R@5: `bm25-snow` gains q014, q017 and q019 and loses none (+0.06, exactly at the threshold), so it replaces p5. `bm25-zeyrek` gains 2, `bm25-none` 1.
+
+## Answer results
+
+`--rerank --stem snow --prompt v1 --tag v4`, everything else as v3; the top-5 of every question matches the `pipe-snow` row.
+
+| | v3 (bm25-p5) | v4 (bm25-snow) |
+|---|---|---|
+| Golden, correct (user graded) | 47 / 50 | 49 / 50 |
+| Golden, citation check pass | 40 | 43 |
+| Abstention, correct (user graded) | 10 / 10 | 10 / 10 |
+
+v3 -> v4: q014 now quotes the Madde 28 exemption for personal and household use; q029 became correct; nothing went from correct to wrong. q007 is still wrong (now "bilgi yok"). The q029 answer lists general rules (use only for the stated purpose, keep the notice up to date) and not the gold rule (a new purpose needs a new notice); answers of that kind were graded wrong in v3 (q007, q014), so with the v3 standard v4 is 48 / 50.
+
+## Findings
+
+- Stemming matters a lot for BM25 alone (R@5 0.30 without, about 0.50 with any stemmer), less in the hybrid, and little once the reranker sees the candidates: without any stemming the pipeline still reaches R@5 0.82.
+- Snowball and zeyrek beat the 5-letter cut slightly at the BM25 and hybrid levels, but the differences are 1-3 questions.
+- `bm25-snow` passed the adoption rule exactly at the threshold; in the answers it adds one or two questions.
+
+## Limitations
+
+- The gain is at the threshold of what this set can show, and the questions are not held out.
+- zeyrek's first analysis is often not the right lemma ("Kurula" -> "kurulamak"); a disambiguation step might change its numbers.
 
 Roadmap: see docs/ROADMAP.md
