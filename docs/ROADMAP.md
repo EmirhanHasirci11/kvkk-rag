@@ -9,6 +9,8 @@
 - Step 5 Stemming: bm25-snow replaces bm25-p5 (v4: 49/50)
 - Step 6 Final held-out test (20 + 5 new q): final 12/20 vs baseline 9/20; abstention 5/5 both.
   Every wrong final answer is a retrieval miss; rw-only retrieval (R@5 0.70) beat the final (0.55)
+- Step 7 Serving: FastAPI /ask (scripts/serve.py), p50 19 s, $0.0087/question; pgvector in Docker
+  gives the same top-5 as numpy on all 85 questions (scripts/check_pgvector.py)
 
 ## Next steps (in order)
 1. Generation v0
