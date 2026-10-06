@@ -151,4 +151,50 @@ Abstention set (10 q), `answers_abstention_v0`: 10 of 10 answered "bilgi yok" an
 - 10 abstention questions: one question is worth 0.10.
 - Temperature 0 is not fully deterministic: the same q004 call used 420 and 686 output tokens in two runs (same answer).
 
+
+# Query rewriting
+
+## Setup
+
+- **Rewrite:** before retrieval, `gemini-3.8-flash` rewrites the question into the wording of the KVKK texts (`scripts/rewrite.py`). Rules: don't answer, add no numbers or facts, map everyday words to legal terms. The prompt's only examples are general term mappings ("müşteri" -> "ilgili kişi", "şirket" -> "veri sorumlusu"), nothing from `eval/golden.jsonl`. The rewrite is only a search query; the answer prompt still gets the original question.
+- **Systems** (all `hyb-e5+bm25`, 192/48, depth 50): `orig` the question alone, `rw` the rewrite alone, `fuse` RRF over the dense and BM25 lists of both (`HybridRetriever.search_multi`).
+- **Check:** `orig` reproduces the saved `hyb-e5+bm25` values in `results/test_v1_per_question.csv` for every question and every k.
+- Rewrites are cached in `results/rewrites_v1.jsonl`, so the retrieval eval and the answer run use the same rewrites.
+
+Code: `scripts/eval_rewrite.py`, `python scripts/run_answers.py --rewrite --tag v1`.
+
+## Retrieval results (50 q)
+
+From `results/rewrite_v1_summary.csv`.
+
+| System | R@1 | R@3 | R@5 | R@10 |
+|---|---|---|---|---|
+| orig | 0.38 | 0.56 | 0.64 | 0.73 |
+| rw | 0.37 | 0.67 | 0.75 | 0.78 |
+| fuse | 0.47 | 0.67 | 0.71 | 0.81 |
+
+At R@5, `rw` gains 10 questions and loses 4; `fuse` gains 5 and loses 1 (q050). `fuse` was chosen for the answer run: it loses the fewest questions and is best at R@1 and R@10. The choice was made after seeing all 50 questions.
+
+## Answer results
+
+| | v0 (orig) | v1 (fuse) |
+|---|---|---|
+| Golden, correct (user graded) | 33 / 50 | 35 / 50 |
+| Golden, evidence in top-5 | 32 | 36 |
+| Golden, "bilgi yok" with the evidence in top-5 | 3 | 5 |
+| Abstention, "bilgi yok" (no invented answer) | 10 / 10 | 10 / 10 |
+
+v0 -> v1: q001, q030, q031, q048, q049 became correct; q012, q019, q050 became "bilgi yok" (q050 lost its evidence; in q012 the evidence was still in the top-5).
+
+## Findings
+
+- Rewriting helps retrieval: `fuse` raises R@1 from 0.38 to 0.47 and R@10 from 0.73 to 0.81, with one question lost at R@5.
+- The answer gain is small: +2 questions net (+5, -3), within noise at n = 50. Part of the retrieval gain is lost to the model abstaining while the evidence is in its chunks.
+- Some rewrites add the model's own KVKK knowledge, not only legal wording (q013 adds "Veri Sorumluları Sicili", q031 adds the Madde 4 principle). On the abstention set this did not lead to invented answers: the rewrites turned "kaç saat?" into "yasal süre kaç saattir?" but added no number.
+
+## Limitations
+
+- All 50 golden questions had been seen before, and `fuse` was picked on them. The held-out check is step 6.
+- Every rewrite is one extra LLM call per question (about $0.003).
+
 Roadmap: see docs/ROADMAP.md
