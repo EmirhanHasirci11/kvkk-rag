@@ -267,7 +267,7 @@ At R@5, `orig + bge` gains 10 questions and loses 1 (q020); `fuse + bge` gains 7
 - `bge-reranker-v2-m3` passes the adoption rule on both candidate sets (+0.17 on `orig`, +0.09 on `fuse`). The small mMARCO model does not on `fuse` (+0.05) and loses questions the hybrid already had (q006, q042).
 - With the reranker, the LLM rewrite adds little at the top: `orig + bge` and `fuse + bge` are tied at R@5 (0.81 and 0.80). The rewrite still widens the candidate pool (R@30 0.87 to 0.96), which shows at R@10 (0.83 against 0.88).
 - `orig + bge` reaches 0.81 at R@5 without any LLM call, against 0.71 for `fuse`, the step 3 system.
-- Cost: on CPU (no GPU), bge took 1012 s for 50 questions, about 20 s per question for ~40 distinct candidates. mMARCO took 96 s. That is too slow for serving as it is.
+- Speed: bge took 1012 s for 50 questions on CPU (about 20 s per question for ~40 distinct candidates) and 33 s on an RTX 3080 (about 0.7 s per question); mMARCO took 96 s and 5 s. The GPU rerun gave exactly the same recall for every question, and the hybrid retrieval also reproduces exactly on GPU (same top-5 chunks as the CPU runs for all 50 questions).
 
 ## Limitations
 

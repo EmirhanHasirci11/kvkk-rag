@@ -9,6 +9,8 @@ numpy
 pandas
 
 # embeddings
+# sentence-transformers pulls in a CPU-only torch; for an NVIDIA GPU install the CUDA build afterwards:
+# pip install --force-reinstall --no-deps torch==2.14.1+cu130 --index-url https://download.pytorch.org/whl/cu130
 sentence-transformers
 
 # generation
