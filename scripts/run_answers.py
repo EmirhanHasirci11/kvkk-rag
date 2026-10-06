@@ -4,6 +4,7 @@ Run from the repo root:
     python scripts/run_answers.py [--ids q004 q007] [--tag v0]
     python scripts/run_answers.py --questions eval/abstention.jsonl --tag abstention_v0
     python scripts/run_answers.py --rewrite --tag v1    (reuses results/rewrites_v1.jsonl)
+    python scripts/run_answers.py --rewrite --rewrites results/rewrites_v1.jsonl --prompt v1 --tag v2
 
 Writes results/answers_<tag>.jsonl and results/answers_<tag>_grading.csv and refuses to
 overwrite them. citation_check: "pass" when every gold fact (any alternative) is contained
@@ -17,7 +18,7 @@ import json
 import sys
 from pathlib import Path
 
-from answer import answer, load_retriever
+from answer import PROMPTS, answer, load_retriever
 from golden import facts, load_golden, norm
 from llm import BUDGET_USD, BudgetExceeded, spent_usd
 
@@ -61,9 +62,11 @@ def main():
     parser.add_argument("--tag", default="v0", help="output file suffix")
     parser.add_argument("--rewrite", action="store_true",
                         help="also search with the LLM rewrite of each question, cached in results/rewrites_<tag>.jsonl")
+    parser.add_argument("--rewrites", help="rewrite cache to use instead, e.g. results/rewrites_v1.jsonl")
+    parser.add_argument("--prompt", choices=sorted(PROMPTS), default="v0", help="system prompt version")
     args = parser.parse_args()
 
-    cache = ROOT / f"results/rewrites_{args.tag}.jsonl"
+    cache = ROOT / (args.rewrites or f"results/rewrites_{args.tag}.jsonl")
     rewrites = {}
     if args.rewrite and cache.exists():
         rewrites = {r["id"]: r for r in map(json.loads, cache.read_text(encoding="utf-8").splitlines())}
@@ -83,7 +86,7 @@ def main():
     for g in questions:
         try:
             rw = cached_rewrite(g, cache, rewrites) if args.rewrite else None
-            r = answer(g["question"], retriever, rewritten=rw["rewrite"] if rw else None)
+            r = answer(g["question"], retriever, rewritten=rw["rewrite"] if rw else None, prompt=args.prompt)
             if rw:
                 r["rewrite_cost_usd"] = rw["cost_usd"]
         except BudgetExceeded as e:
