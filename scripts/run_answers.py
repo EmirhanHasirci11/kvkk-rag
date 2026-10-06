@@ -1,10 +1,13 @@
-"""Answer every question in eval/golden.jsonl and write the answers plus a grading sheet.
+"""Answer every question in a question file and write the answers plus a grading sheet.
 
-Run from the repo root: python scripts/run_answers.py [--ids q004 q007] [--tag v0]
+Run from the repo root:
+    python scripts/run_answers.py [--ids q004 q007] [--tag v0]
+    python scripts/run_answers.py --questions eval/abstention.jsonl --tag abstention_v0
 
 Writes results/answers_<tag>.jsonl and results/answers_<tag>_grading.csv and refuses to
 overwrite them. citation_check: "pass" when every gold fact (any alternative) is contained
-in a chunk the answer cites, "fail" when not, "no_citation" when the answer cites nothing.
+in a chunk the answer cites, "fail" when not, "no_citation" when the answer cites nothing,
+"n/a" for questions without evidence (eval/abstention.jsonl, graded against "expected").
 A failed question is recorded with its error and the run continues.
 """
 import argparse
@@ -37,6 +40,7 @@ def evidence_text(fact_list: list[list[str]]) -> str:
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser()
+    parser.add_argument("--questions", default="eval/golden.jsonl", help="question file, relative to the repo root")
     parser.add_argument("--ids", nargs="+", help="run only these question ids")
     parser.add_argument("--tag", default="v0", help="output file suffix")
     args = parser.parse_args()
@@ -47,14 +51,13 @@ def main():
         if p.exists():
             sys.exit(f"{p.relative_to(ROOT)} already exists; use a new --tag")
 
-    questions = load_golden(ROOT / "eval/golden.jsonl")
+    questions = load_golden(ROOT / args.questions)
     if args.ids:
         questions = [g for g in questions if g["id"] in args.ids]
     retriever = load_retriever()
 
     rows, errors = [], []
     for g in questions:
-        fl = facts(g)
         try:
             r = answer(g["question"], retriever)
         except BudgetExceeded as e:
@@ -67,7 +70,8 @@ def main():
             rows.append({"id": g["id"], "question": g["question"], "error": f"{type(e).__name__}: {e}"})
             print(f"{g['id']}: ERROR {type(e).__name__}: {e}")
             continue
-        r = {"id": g["id"], **r, "citation_check": citation_check(r, fl)}
+        check = citation_check(r, facts(g)) if "evidence" in g else "n/a"
+        r = {"id": g["id"], **r, "citation_check": check}
         rows.append(r)
         print(f"{g['id']}: {r['citation_check']:<11} no_info={r['no_info']!s:<5} ${r['cost_usd']:.5f}")
 
@@ -76,19 +80,25 @@ def main():
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
 
     gold = {g["id"]: g for g in questions}
+    with_evidence = any("evidence" in g for g in questions)
     # utf-8-sig so Excel shows the Turkish characters correctly
     with out_csv.open("w", encoding="utf-8-sig", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["id", "question", "answer", "gold_evidence", "citation_check", "grade", "note"])
+        w.writerow(["id", "question", "answer", "gold_evidence" if with_evidence else "expected",
+                    "citation_check", "grade", "note"])
         for r in rows:
-            w.writerow([r["id"], r["question"], r.get("answer", ""), evidence_text(facts(gold[r["id"]])),
+            g = gold[r["id"]]
+            w.writerow([r["id"], r["question"], r.get("answer", ""),
+                        evidence_text(facts(g)) if "evidence" in g else g.get("expected", ""),
                         r.get("citation_check", "error"), "", ""])
 
     done = [r for r in rows if "error" not in r]
-    passed = sum(r["citation_check"] == "pass" for r in done)
+    checked = [r for r in done if r["citation_check"] != "n/a"]
+    passed = sum(r["citation_check"] == "pass" for r in checked)
     print(f"\n{len(done)} answered, {len(errors)} errors")
+    if checked:
+        print(f"citation check pass: {passed}/{len(checked)} = {passed / len(checked):.2f}")
     if done:
-        print(f"citation check pass: {passed}/{len(done)} = {passed / len(done):.2f}")
         print(f"'bilgi yok' answers: {sum(r['no_info'] for r in done)}")
         print(f"run cost: ${sum(r['cost_usd'] for r in done):.4f}")
     print(f"total spent: ${spent_usd():.4f} / ${BUDGET_USD:.2f}")
