@@ -269,9 +269,33 @@ At R@5, `orig + bge` gains 10 questions and loses 1 (q020); `fuse + bge` gains 7
 - `orig + bge` reaches 0.81 at R@5 without any LLM call, against 0.71 for `fuse`, the step 3 system.
 - Speed: bge took 1012 s for 50 questions on CPU (about 20 s per question for ~40 distinct candidates) and 33 s on an RTX 3080 (about 0.7 s per question); mMARCO took 96 s and 5 s. The GPU rerun gave exactly the same recall for every question, and the hybrid retrieval also reproduces exactly on GPU (same top-5 chunks as the CPU runs for all 50 questions).
 
+## Answer results
+
+`fuse` top-30 -> bge rerank -> top-5 -> prompt v1 (`--rerank --prompt v1 --tag v3`). Everything except the reranker is the same as v2, and the top-5 of every question matches the `fuse + bge` row above.
+
+| | v2 (no rerank) | v3 (rerank) |
+|---|---|---|
+| Golden, correct (user graded) | 43 / 50 | 47 / 50 |
+| Golden, "bilgi yok" | 6 | 1 |
+| Golden, citation check pass | 35 | 40 |
+| Abstention, correct (user graded) | 10 / 10 | 10 / 10 |
+
+v2 -> v3: q004, q005, q024 and q050 became correct; no question went from correct to wrong. q004 ("Sitemiz hacklendi..."), missed by every system since the start, is answered from Madde 12. The 3 wrong answers: q029 is a retrieval miss ("bilgi yok"); q007 and q014 list general rules and miss the rule that answers them (aydınlatma and açık rıza taken separately; the Madde 28 exemption for personal and household use). On the abstention set, 5 answers are a plain "bilgi yok" and 5 quote a related rule while saying the asked number or case is not in the texts; nothing is invented.
+
+## Progress (golden set, user graded)
+
+| Version | Retrieval | Prompt | Correct |
+|---|---|---|---|
+| v0 | orig | v0 | 33 / 50 |
+| v1 | fuse (rewrite) | v0 | 35 / 50 |
+| v2 | fuse | v1 | 43 / 50 |
+| v3 | fuse + bge rerank | v1 | 47 / 50 |
+
+Abstention set: 10 / 10 in every version.
+
 ## Limitations
 
-- The setup and the adoption rule were fixed before the run and nothing was tuned, but `fuse` itself was chosen on these 50 questions in step 3.
-- Retrieval only. The answer quality with the reranked chunks has not been measured yet.
+- The setup and the adoption rule were fixed before the run and nothing was tuned, but `fuse` was chosen and the v1 prompt was written on these same 50 questions. 47 / 50 is not a held-out number; step 6 is.
+- The grading counts an answer as correct when it answers from a valid cited rule, even if it is not the gold passage.
 
 Roadmap: see docs/ROADMAP.md
