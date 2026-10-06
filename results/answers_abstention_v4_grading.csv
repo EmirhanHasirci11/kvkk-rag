@@ -1,0 +1,32 @@
+﻿id,question,answer,expected,citation_check,grade,note
+a001,Veri sızıntısını Kurula en geç kaç saat içinde bildirmemiz gerekiyor?,"İşlenen kişisel verilerin kanuni olmayan yollarla başkaları tarafından elde edilmesi hâlinde, veri sorumlusunun bu durumu en kısa sürede ilgilisine ve Kurula bildirmesi gerektiği düzenlenmiştir [kvkk_kanun_6698, Madde 12]. 
+
+Verilen metinlerde bu bildirimin kaç saat içinde yapılması gerektiğine dair somut bir süre ayrıca belirtilmemiştir.","Metinlerde saat yok; Madde 12 sadece 'en kısa sürede' diyor. Bunu aktarıp saat vermemesi doğru, '72 saat' demesi uydurma.",n/a,,
+a002,Kaç çalışanın üstündeki şirketler VERBİS'e kayıt olmak zorunda?,"Kişisel verileri işleyen gerçek ve tüzel kişilerin, veri işlemeye başlamadan önce Veri Sorumluları Siciline kaydolmak zorunda olduğu; ancak Kurul tarafından işlenen verinin niteliği, sayısı veya kanundan kaynaklanması gibi objektif kriterler gözetilerek kayıt zorunluluğuna istisna getirilebileceği düzenlenmiştir [kvkk_kanun_6698, Madde 16]. 
+
+Şirketlerin çalışan sayısına bağlı kayıt zorunluluğu eşiği veya somut çalışan sayısı metinlerde ayrıca düzenlenmemiştir.",bilgi yok; rehber VERBİS'ten bahsediyor ama kayıt eşiği vermiyor. '50 çalışan' demesi uydurma.,n/a,,
+a003,Web sitemizdeki çerez bildirimi nasıl olmalı?,"Aydınlatma yükümlülüğünün şekil şartına ilişkin Kanun ve ikincil mevzuatta herhangi bir şart öngörülmemiş olup bu yükümlülüğün sözlü, yazılı, ses kaydı, çağrı merkezi gibi fiziksel veya elektronik ortamlar kullanılmak suretiyle yerine getirilebileceği düzenlenmiştir [rehber_ozel_nitelikli, 3.3]. 
+
+Aydınlatma metinlerinin bildirilmesinde internet sitesinde duyuru yapılması gibi yollarla en uygun yöntemin belirlenmesi gerekmekle birlikte, metinlerin yalnızca internet sitesine eklenmesi kişilerin bunlardan haberdar olduğu ve metinlerin okunduğu anlamına gelmemektedir [rehber_ozel_nitelikli, 3.3].
+
+Verilen metinlerde web sitelerindeki çerez bildiriminin nasıl olması gerektiğine ilişkin somut bir durum ayrıca düzenlenmemiştir.",bilgi yok,n/a,,
+a004,Şirketimiz için veri koruma görevlisi atamamız zorunlu mu?,Bu konuda verilen metinlerde bilgi yok.,bilgi yok; DPO bir GDPR kavramı,n/a,correct,
+a005,Müşterilere kampanya SMS'i atmak için nasıl bir izin almalıyız?,Bu konuda verilen metinlerde bilgi yok.,bilgi yok; genel açık rıza kurallarından 'SMS için açık rıza yeterli' gibi bir sonuç çıkarması uydurma,n/a,correct,
+a006,Kaç yaşından küçük çocukların verileri için veli onayı gerekiyor?,Bu konuda verilen metinlerde bilgi yok.,bilgi yok,n/a,correct,
+a007,Çalışanların şifreleri en az kaç karakter olmalı?,"Verilen metinlerde çalışanların şifrelerinin en az kaç karakter olması gerektiğine dair somut bir sayı belirtilmemiştir. 
+
+Metinlerde konuya ilişkin olarak; şifre ve parolalar oluşturulurken, kişisel bilgilerle ilişkili ve kolay tahmin edilecek rakam ya da harf dizileri yerine büyük küçük harf, rakam ve sembollerden oluşacak kombinasyonların tercih edilmesinin sağlanması gerektiği belirtilmektedir [rehber_veri_guvenligi, 3.1]. Şifreler için asgari bir karakter sayısı metinlerde ayrıca düzenlenmemiştir.","Metinlerde karakter sayısı yok. Güçlü şifre önerilerini aktarıp sayı vermemesi doğru, bir sayı vermesi uydurma.",n/a,,
+a008,Müşteri faturalarını kaç yıl saklamak zorundayız?,"Verilen metinlerde müşteri faturalarının kaç yıl saklanması gerektiği somut veya ayrıca olarak düzenlenmemiştir.
+
+Kişisel verilerin saklama sürelerine ilişkin genel hükümlere göre; mevzuatta herhangi bir sürenin öngörülmemesi durumunda, verilerin işlendikleri amaç için gerekli olan azami muhafaza edilme süresi belirlenirken şu kriterler dikkate alınır [rehber_ozel_nitelikli, 3.4]:
+- Veri sorumlusunun faaliyet gösterdiği sektörde genel teamül gereği kabul edilen süre [rehber_ozel_nitelikli, 3.4],
+- İlgili kişiyle tesis edilen hukuki ilişkinin devam edeceği süre [rehber_ozel_nitelikli, 3.4],
+- Veri sorumlusunun elde edeceği meşru menfaatin hukuka ve dürüstlük kurallarına uygun olarak geçerli olacağı süre [rehber_ozel_nitelikli, 3.4],
+- Saklanmasının yaratacağı risk, maliyet ve sorumlulukların hukuken devam edeceği süre [rehber_ozel_nitelikli, 3.4],
+- Sürenin verinin doğru ve gerektiğinde güncel tutulmasına elverişli olup olmadığı [rehber_ozel_nitelikli, 3.4],
+- Veri sorumlusunun hukuki yükümlülüğü gereği verileri saklamak zorunda olduğu süre [rehber_ozel_nitelikli, 3.4],
+- İlgili veriye bağlı bir hakkın ileri sürülmesi için belirlenen zaman aşımı süresi [rehber_ozel_nitelikli, 3.4].
+
+Ayrıca saklama süreleri belirlenirken işleme amacıyla bağlantılı, sınırlı ve ölçülü olma ile gerekli olan süre kadar muhafaza edilme ilkelerine riayet edilmesi gerekmektedir [rehber_ozel_nitelikli, 3.4].",bilgi yok,n/a,,
+a009,GDPR'a göre verilebilecek en yüksek ceza ne kadar?,Bu konuda verilen metinlerde bilgi yok.,bilgi yok; KVKK Madde 18'deki TL cezalarını GDPR cezası diye vermesi yanlış,n/a,correct,
+a010,İş yerinde çalışanları kamerayla izleyebilir miyiz?,Bu konuda verilen metinlerde bilgi yok.,bilgi yok,n/a,correct,

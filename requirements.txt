@@ -13,6 +13,10 @@ pandas
 # pip install --force-reinstall --no-deps torch==2.14.1+cu130 --index-url https://download.pytorch.org/whl/cu130
 sentence-transformers
 
+# BM25 stemmers (scripts/textproc.py)
+snowballstemmer
+zeyrek
+
 # generation
 google-genai
 python-dotenv

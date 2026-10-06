@@ -4,6 +4,7 @@ Run from the repo root: python scripts/answer.py "soru" [--rewrite] [--prompt v1
 --rewrite also searches with an LLM rewrite of the question (scripts/rewrite.py).
 --prompt picks the system prompt version (PROMPTS), default v0.
 --rerank reorders the top-30 candidates with bge-reranker-v2-m3 (scripts/reranker.py).
+--stem picks the BM25 stemmer (prefix5, snow, zeyrek, none), default prefix5.
 --dry-run prints the prompt and makes no LLM call.
 """
 import argparse
@@ -74,10 +75,10 @@ def is_no_info(answer: str) -> bool:
     return NO_INFO.rstrip(".").casefold() in answer.casefold()
 
 
-def load_retriever():
+def load_retriever(stem="prefix5"):
     from retriever import HybridRetriever
     texts = {p.stem: p.read_text(encoding="utf-8") for p in sorted((ROOT / "corpus/text").glob("*.txt"))}
-    return HybridRetriever(texts)
+    return HybridRetriever(texts, stem=stem)
 
 
 def answer(question: str, retriever, k=TOP_K, rewritten: str | None = None, prompt="v0",
@@ -105,10 +106,11 @@ def main():
     parser.add_argument("--rewrite", action="store_true", help="also search with an LLM rewrite of the question")
     parser.add_argument("--prompt", choices=sorted(PROMPTS), default="v0", help="system prompt version")
     parser.add_argument("--rerank", action="store_true", help="rerank the top-30 with bge-reranker-v2-m3")
+    parser.add_argument("--stem", default="prefix5", help="BM25 stemmer, a key of textproc.STEMMERS")
     parser.add_argument("--dry-run", action="store_true", help="print the prompt, do not call the LLM")
     args = parser.parse_args()
 
-    retriever = load_retriever()
+    retriever = load_retriever(args.stem)
     if args.dry_run:
         print(PROMPTS[args.prompt], "\n\n" + build_prompt(args.question, retriever.search(args.question, k=TOP_K)))
         return

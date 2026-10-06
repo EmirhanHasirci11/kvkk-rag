@@ -21,10 +21,12 @@ STEM = "prefix5"
 
 
 class HybridRetriever:
-    def __init__(self, texts: dict[str, str], size=192, overlap=48, depth=50, k_rrf=60):
-        """texts maps document name to full text. Documents are chunked separately, in dict order."""
+    def __init__(self, texts: dict[str, str], size=192, overlap=48, depth=50, k_rrf=60, stem=STEM):
+        """texts maps document name to full text. Documents are chunked separately, in dict order.
+        stem: BM25 stemmer, a key of textproc.STEMMERS."""
         self.depth = depth
         self.k_rrf = k_rrf
+        self.stem = stem
         # chunk each document separately so no chunk mixes two documents
         self.chunks = [{"doc": doc, "text": c, **meta}
                        for doc, t in texts.items()
@@ -32,13 +34,13 @@ class HybridRetriever:
         self.model = SentenceTransformer(MODEL_NAME)
         self.vecs = self.model.encode(["passage: " + c["text"] for c in self.chunks],
                                       normalize_embeddings=True, batch_size=32, show_progress_bar=False)
-        self.bm25 = BM25([tokenize(c["text"], STEM) for c in self.chunks])
+        self.bm25 = BM25([tokenize(c["text"], self.stem) for c in self.chunks])
 
     def ranked_lists(self, query: str) -> list[list[int]]:
         """Dense and BM25 rankings of the top `depth` chunk indices for one query, best first."""
         q = self.model.encode(["query: " + query], normalize_embeddings=True, show_progress_bar=False)[0]
         dense = np.argsort(-(self.vecs @ q))[:self.depth].tolist()    # cosine similarity, vectors are normalized
-        sparse = [i for i, _ in self.bm25.search(tokenize(query, STEM), k=self.depth)]
+        sparse = [i for i, _ in self.bm25.search(tokenize(query, self.stem), k=self.depth)]
         return [dense, sparse]
 
     def search(self, query: str, k=5) -> list[dict]:

@@ -6,6 +6,7 @@ Run from the repo root:
     python scripts/run_answers.py --rewrite --tag v1    (reuses results/rewrites_v1.jsonl)
     python scripts/run_answers.py --rewrite --rewrites results/rewrites_v1.jsonl --prompt v1 --tag v2
     python scripts/run_answers.py --rewrite --rewrites results/rewrites_v1.jsonl --prompt v1 --rerank --tag v3
+    python scripts/run_answers.py --rewrite --rewrites results/rewrites_v1.jsonl --prompt v1 --rerank --stem snow --tag v4
 
 Writes results/answers_<tag>.jsonl and results/answers_<tag>_grading.csv and refuses to
 overwrite them. citation_check: "pass" when every gold fact (any alternative) is contained
@@ -66,6 +67,7 @@ def main():
     parser.add_argument("--rewrites", help="rewrite cache to use instead, e.g. results/rewrites_v1.jsonl")
     parser.add_argument("--prompt", choices=sorted(PROMPTS), default="v0", help="system prompt version")
     parser.add_argument("--rerank", action="store_true", help="rerank the top-30 with bge-reranker-v2-m3")
+    parser.add_argument("--stem", default="prefix5", help="BM25 stemmer, a key of textproc.STEMMERS")
     args = parser.parse_args()
 
     cache = ROOT / (args.rewrites or f"results/rewrites_{args.tag}.jsonl")
@@ -82,7 +84,7 @@ def main():
     questions = load_golden(ROOT / args.questions)
     if args.ids:
         questions = [g for g in questions if g["id"] in args.ids]
-    retriever = load_retriever()
+    retriever = load_retriever(args.stem)
     reranker = None
     if args.rerank:
         from reranker import Reranker

@@ -1,5 +1,6 @@
 """Turkish text normalization and tokenization for lexical search (BM25)."""
 import re
+from functools import lru_cache
 
 TOKEN_RE = re.compile(r"[a-zçğıöşüâîû0-9]+")
 
@@ -14,9 +15,40 @@ def stem_prefix5(word):
     return word[:5]
 
 
+@lru_cache(maxsize=None)
+def _snowball():
+    import snowballstemmer
+    return snowballstemmer.stemmer("turkish")
+
+
+@lru_cache(maxsize=None)
+def stem_snowball(word):
+    # Turkish Snowball stemmer: strips suffixes by rule, no dictionary
+    return _snowball().stemWord(word)
+
+
+@lru_cache(maxsize=None)
+def _zeyrek():
+    import logging
+    import zeyrek
+    # zeyrek logs every analysis it finds as a warning
+    logging.getLogger("zeyrek.rulebasedanalyzer").setLevel(logging.ERROR)
+    return zeyrek.MorphAnalyzer()
+
+
+@lru_cache(maxsize=None)
+def stem_zeyrek(word):
+    # zeyrek (Python port of Zemberek) has no disambiguation, so take the lemma of its first
+    # analysis; words it does not know stay as they are
+    analyses = _zeyrek()._parse(word)    # word-level parse, skips zeyrek's NLTK tokenizer
+    return tr_lower(analyses[0].dict_item.lemma) if analyses else word
+
+
 STEMMERS = {
     "none": lambda w: w,
     "prefix5": stem_prefix5,
+    "snow": stem_snowball,
+    "zeyrek": stem_zeyrek,
 }
 
 
