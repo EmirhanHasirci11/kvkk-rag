@@ -5,6 +5,7 @@ Run from the repo root:
     python scripts/run_answers.py --questions eval/abstention.jsonl --tag abstention_v0
     python scripts/run_answers.py --rewrite --tag v1    (reuses results/rewrites_v1.jsonl)
     python scripts/run_answers.py --rewrite --rewrites results/rewrites_v1.jsonl --prompt v1 --tag v2
+    python scripts/run_answers.py --rewrite --rewrites results/rewrites_v1.jsonl --prompt v1 --rerank --tag v3
 
 Writes results/answers_<tag>.jsonl and results/answers_<tag>_grading.csv and refuses to
 overwrite them. citation_check: "pass" when every gold fact (any alternative) is contained
@@ -64,6 +65,7 @@ def main():
                         help="also search with the LLM rewrite of each question, cached in results/rewrites_<tag>.jsonl")
     parser.add_argument("--rewrites", help="rewrite cache to use instead, e.g. results/rewrites_v1.jsonl")
     parser.add_argument("--prompt", choices=sorted(PROMPTS), default="v0", help="system prompt version")
+    parser.add_argument("--rerank", action="store_true", help="rerank the top-30 with bge-reranker-v2-m3")
     args = parser.parse_args()
 
     cache = ROOT / (args.rewrites or f"results/rewrites_{args.tag}.jsonl")
@@ -81,12 +83,17 @@ def main():
     if args.ids:
         questions = [g for g in questions if g["id"] in args.ids]
     retriever = load_retriever()
+    reranker = None
+    if args.rerank:
+        from reranker import Reranker
+        reranker = Reranker()
 
     rows, errors = [], []
     for g in questions:
         try:
             rw = cached_rewrite(g, cache, rewrites) if args.rewrite else None
-            r = answer(g["question"], retriever, rewritten=rw["rewrite"] if rw else None, prompt=args.prompt)
+            r = answer(g["question"], retriever, rewritten=rw["rewrite"] if rw else None, prompt=args.prompt,
+                       reranker=reranker)
             if rw:
                 r["rewrite_cost_usd"] = rw["cost_usd"]
         except BudgetExceeded as e:

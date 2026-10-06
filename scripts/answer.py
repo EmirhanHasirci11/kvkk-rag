@@ -3,6 +3,7 @@
 Run from the repo root: python scripts/answer.py "soru" [--rewrite] [--prompt v1] [--dry-run]
 --rewrite also searches with an LLM rewrite of the question (scripts/rewrite.py).
 --prompt picks the system prompt version (PROMPTS), default v0.
+--rerank reorders the top-30 candidates with bge-reranker-v2-m3 (scripts/reranker.py).
 --dry-run prints the prompt and makes no LLM call.
 """
 import argparse
@@ -79,11 +80,17 @@ def load_retriever():
     return HybridRetriever(texts)
 
 
-def answer(question: str, retriever, k=TOP_K, rewritten: str | None = None, prompt="v0") -> dict:
+def answer(question: str, retriever, k=TOP_K, rewritten: str | None = None, prompt="v0",
+           reranker=None, n_candidates=30) -> dict:
     """rewritten: optional rewrite of the question, used only as an extra search query (RRF with the question).
-    prompt: key of PROMPTS, the system prompt version."""
+    prompt: key of PROMPTS, the system prompt version.
+    reranker: optional Reranker; it reorders the top n_candidates by the question and keeps the best k."""
     from llm import MODEL, generate
-    chunks = retriever.search_multi([question] + ([rewritten] if rewritten else []), k=k)
+    queries = [question] + ([rewritten] if rewritten else [])
+    if reranker:
+        chunks = reranker.rerank(question, retriever.search_multi(queries, k=n_candidates), k=k)
+    else:
+        chunks = retriever.search_multi(queries, k=k)
     out = generate(build_prompt(question, chunks), PROMPTS[prompt])
     return {"question": question, "rewrite": rewritten, "prompt": prompt, "model": MODEL, "retrieved": chunks,
             "answer": out["text"],
@@ -97,6 +104,7 @@ def main():
     parser.add_argument("question")
     parser.add_argument("--rewrite", action="store_true", help="also search with an LLM rewrite of the question")
     parser.add_argument("--prompt", choices=sorted(PROMPTS), default="v0", help="system prompt version")
+    parser.add_argument("--rerank", action="store_true", help="rerank the top-30 with bge-reranker-v2-m3")
     parser.add_argument("--dry-run", action="store_true", help="print the prompt, do not call the LLM")
     args = parser.parse_args()
 
@@ -111,7 +119,11 @@ def main():
         from rewrite import rewrite
         rw = rewrite(args.question)
         print(f"Arama sorgusu: {rw['text']}  (${rw['cost_usd']:.5f})\n")
-    r = answer(args.question, retriever, rewritten=rw["text"] if rw else None, prompt=args.prompt)
+    reranker = None
+    if args.rerank:
+        from reranker import Reranker
+        reranker = Reranker()
+    r = answer(args.question, retriever, rewritten=rw["text"] if rw else None, prompt=args.prompt, reranker=reranker)
     print(r["answer"].strip(), "\n")
     print("Kaynaklar:")
     for c in r["citations"]:
