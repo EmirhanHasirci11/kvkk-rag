@@ -15,7 +15,8 @@ import numpy as np
 import psycopg
 from pgvector.psycopg import register_vector
 
-DEFAULT_DSN = "postgresql://kvkk:kvkk@localhost:5432/kvkk"
+# 127.0.0.1, not localhost: on Windows localhost tries ::1 first, and the port is bound to IPv4 only (130 s timeout)
+DEFAULT_DSN = "postgresql://kvkk:kvkk@127.0.0.1:5432/kvkk"
 
 
 class PgVectorIndex:

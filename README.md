@@ -417,7 +417,7 @@ On the 5 new abstention questions the final system says "bilgi yok" once and quo
 
 - **API:** `scripts/serve.py` (FastAPI). `POST /ask {"question": ...}` returns the answer, its citations, the five source chunks (doc and article / section), the rewrite, tokens, cost and per-stage timings; `GET /health` reports readiness and the budget. One request at a time, since the models share one GPU.
 - **Pipeline:** `scripts/pipeline.py`, the frozen final system (v4). With the cached rewrites it returns the same top-5 as `results/answers_v4.jsonl` for all 50 golden questions.
-- **pgvector:** `docker-compose.yml` runs Postgres with pgvector; `scripts/pgstore.py` stores the chunk embeddings and searches them by cosine distance (`KVKK_DENSE=pgvector`). The table is rebuilt only when the chunks or the model change. The default dense backend stays in-memory numpy.
+- **pgvector:** `docker-compose.yml` runs Postgres with pgvector; `scripts/pgstore.py` stores the chunk embeddings and searches them by cosine distance (`KVKK_DENSE=pgvector`). The table is rebuilt only when the chunks or the model change. The default dense backend stays in-memory numpy. Start it with `docker compose up -d`; `DATABASE_URL` overrides the default `127.0.0.1` connection.
 - **Hardware:** RTX 3080 for e5 and the reranker; the LLM is the Gemini API.
 
 ```
@@ -425,27 +425,40 @@ uvicorn serve:app --app-dir scripts --port 8000
 curl -X POST localhost:8000/ask -H "Content-Type: application/json" -d '{"question": "Açık rıza nedir?"}'
 ```
 
-## Latency and cost (numpy backend, 10 golden questions)
+## pgvector reproduces numpy
 
-From `results/serving_v1_numpy_summary.csv`, written by `scripts/bench_serving.py` (in-process HTTP, one request at a time, after a warm-up).
+`scripts/check_pgvector.py` (no LLM calls) builds the retriever with both backends and runs all 85 distinct questions (golden, held-out, abstention) with their cached rewrites, 170 queries.
 
-| Stage | p50 (ms) | p95 (ms) | mean (ms) |
-|---|---|---|---|
-| LLM rewrite | 9,379 | 10,540 | 9,319 |
-| Retrieval (e5 + BM25 + RRF, 2 queries) | 75 | 86 | 76 |
-| Rerank (bge, 30 candidates) | 680 | 747 | 686 |
-| LLM answer | 8,193 | 20,675 | 9,931 |
-| Total | 19,238 | 30,205 | 20,013 |
+| Check | Differs |
+|---|---|
+| Stored chunk vectors (153 x 768) | max difference 0 |
+| Dense top-50 order, per query | 1 / 170 |
+| Fused top-30 order, per question | 1 / 85 (q002) |
+| Fused top-30 set, per question | 0 / 85 |
+| Reranked top-5 (what the LLM sees) | 0 / 85 |
 
-Cost: $0.0076 per question at p50, $0.0087 on average (rewrite + answer, thinking tokens included). Startup: 15.5 s (chunking, embedding the corpus, loading both models).
+The one difference is a near tie: for q002's rewrite, chunks 82 and 2 have cosines 0.83835572 and 0.83835566 in numpy, and pgvector, computing the distance in its own float arithmetic, puts them the other way round at rank 20. After fusion this swaps ranks 16 and 17 of the 30 candidates; the reranker scores the same 30 and returns the same top-5. So the pgvector backend gives the same answers as numpy on every question, and the held-out numbers stand.
+
+## Latency and cost (10 golden questions)
+
+From `results/serving_v1_numpy_summary.csv` and `results/serving_v1_pgvector_summary.csv`, written by `scripts/bench_serving.py` (in-process HTTP, one request at a time, after a warm-up). p50 / p95 in ms.
+
+| Stage | numpy | pgvector |
+|---|---|---|
+| LLM rewrite | 9,379 / 10,540 | 8,661 / 11,329 |
+| Retrieval (e5 + BM25 + RRF, 2 queries) | 75 / 86 | 104 / 288 |
+| Rerank (bge, 30 candidates) | 680 / 747 | 623 / 765 |
+| LLM answer | 8,193 / 20,675 | 8,516 / 10,042 |
+| Total | 19,238 / 30,205 | 18,837 / 21,610 |
+
+Cost: numpy $0.0076 per question at p50, $0.0087 on average; pgvector $0.0085 and $0.0080 (rewrite + answer, thinking tokens included). The two runs make different LLM calls, so the LLM rows and the cost differ by run-to-run noise, not by backend.
+
+Startup: 15.5 s with numpy (chunking, embedding the corpus, loading both models). The pgvector run's summary says 147.4 s: the connection string then used `localhost`, which on Windows tries `::1` first, while the compose port is bound to IPv4 only, so connecting waited 130 s before falling back. With `127.0.0.1` (now the default) the connection takes 0.01 s and `Pipeline(dense="pgvector")` starts in 15.5 s, the same as numpy (14.5 s in the same session); the corpus is not re-embedded, because its hash is already stored. The per-request numbers are not affected: the connection is opened once at startup.
 
 ## Findings
 
 - Almost all the latency is the two LLM calls. Retrieval and reranking together take under 0.8 s.
 - The rewrite takes as long as the answer, although its output is one or two sentences; most of it is the model's default thinking. Turning thinking down would cut the latency, but it changes the rewrites, so it needs its own evaluation.
-
-## Not done yet
-
-- The pgvector backend is written but not measured: Docker Desktop on this machine needs WSL 2, which is not installed yet. When it runs, the check is that the pgvector dense rankings reproduce the numpy ones for every question, then the same latency table with `--dense pgvector`.
+- pgvector adds about 30 ms at p50 to retrieval (two round trips to Postgres per question, the question and its rewrite, each an exact scan over 153 chunks). At this corpus size it buys nothing measurable: embedding 153 chunks on the GPU is a small part of the 15 s startup, which model loading dominates. It is the piece that would matter with a corpus too large to embed at every start or keep in memory.
 
 Roadmap: see docs/ROADMAP.md

@@ -1,5 +1,5 @@
 # Postgres with pgvector for the chunk embeddings (scripts/pgstore.py).
-# Local development only: the password is not a secret, and the port is bound to localhost.
+# Local development only: the password is not a secret, and the port is bound to 127.0.0.1 (IPv4 only).
 services:
   db:
     image: pgvector/pgvector:pg17
