@@ -100,4 +100,55 @@ BM25 R@10 is 0.42 without stemming and 0.60 with prefix5. `e5` and `hyb-e5+bm25`
 - Verbatim-evidence recall checks that the labeled sentence is in the top-k chunks. It does not measure whether an answer would be correct, and other passages that support an answer are not counted.
 - Concept gaps are not solved. q007 and q014 describe a situation without using the legal terms, and neither BM25 nor the embeddings bridge that.
 
+
+# Generation results
+
+## Setup
+
+- **Pipeline:** `hyb-e5+bm25` top-5 chunks (192/48) -> `gemini-3.8-flash` (google-genai SDK, temperature 0) -> short Turkish answer with a citation after every claim. Prompt rules: answer only from the given chunks, cite as `[doc, Madde n]` (guides: `[doc, 3.1]`), say "Bu konuda verilen metinlerde bilgi yok." when the chunks don't answer it, quote the text and give no legal advice.
+- **Chunk metadata:** every chunk carries its doc id, the article (`Madde n`, `Geçici Madde n`) or guide section (`3.1`) in force at its first word, and every label it covers (`scripts/sections.py`). Adding it did not change retrieval: dev R@1/3/5/10 reproduced as 0.33 / 0.50 / 0.57 / 0.65.
+- **Grading:** the user graded every answer as correct / partial / wrong. An answer is correct when it answers the question from the given chunks with a valid citation, also when it cites a passage other than the gold evidence that says the same thing. "Bilgi yok" on a golden question is wrong.
+- **Citation check (automatic):** pass when every gold fact is contained in a chunk the answer cites.
+- **Abstention set:** `eval/abstention.jsonl`, 10 questions whose answer is not in the corpus (cookie banners, VERBİS threshold, a 72-hour breach deadline, GDPR fines, ...). Expected: "bilgi yok", or quoting the related text without inventing the missing number.
+- **Cost:** about $0.004 per question. Prices and the $8 budget cap are in `scripts/llm.py`, every call is logged in `results/llm_usage.csv`.
+
+Code: `scripts/llm.py`, `scripts/answer.py` (`python scripts/answer.py "soru"`), `scripts/run_answers.py`. Answers and grades are in `results/answers_v0*` and `results/answers_abstention_v0*`.
+
+## Results
+
+Golden set (50 q), `answers_v0`:
+
+| Grade | Count | Share |
+|---|---|---|
+| correct | 33 | 0.66 |
+| partial | 0 | 0.00 |
+| wrong | 17 | 0.34 |
+
+All 17 wrong answers are "bilgi yok". In 14 of them the evidence was not in the top-5 chunks; in 3 (q008, q020, q039) it was, and the model still abstained. No answered question was graded wrong.
+
+Citation check against the grades:
+
+| citation_check | Count | Graded correct |
+|---|---|---|
+| pass | 29 | 29 |
+| fail | 4 | 4 |
+| no_citation | 17 | 0 |
+
+The 4 fails cite a different passage that states the same rule (for example the guide quoting the law's definition), so the citation check gives 0.58 where the graded accuracy is 0.66.
+
+Abstention set (10 q), `answers_abstention_v0`: 10 of 10 answered "bilgi yok" and none invented a number or a rule. In a001 and a007 the related text (Madde 12 "en kısa sürede", the password advice in the security guide) was in the top-5 but was not quoted.
+
+## Findings
+
+- Retrieval is the bottleneck: 14 of the 17 failures are questions whose evidence was not retrieved. When the evidence was in the top-5, the model answered correctly in 29 of 32 questions.
+- The model errs on the side of abstaining: no invented answers in 60 questions, but 3 unnecessary abstentions on the golden set.
+- The citation check is a usable lower bound: no false passes, 4 false fails.
+
+## Limitations
+
+- One person wrote the questions and graded the answers.
+- All 50 golden questions were seen while building the retriever, so these are not held-out numbers.
+- 10 abstention questions: one question is worth 0.10.
+- Temperature 0 is not fully deterministic: the same q004 call used 420 and 686 output tokens in two runs (same answer).
+
 Roadmap: see docs/ROADMAP.md
