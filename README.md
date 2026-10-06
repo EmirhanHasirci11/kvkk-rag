@@ -235,4 +235,43 @@ On the abstention set, 6 answers now quote a related rule instead of a plain "bi
 - The v1 prompt was written after reading the failures on these same 50 questions, so 43 / 50 is an optimistic number. The held-out check is step 6.
 - The grading counts an answer as correct when it answers from a valid cited rule, even if it is not the gold passage (q026, q044). A stricter grader would score some of these as partial.
 
+
+# Reranker
+
+## Setup
+
+Fixed before the first run (docstring of `scripts/eval_rerank.py`):
+
+- **Candidates:** top-30 of `orig` (question alone) and of `fuse` (question + the cached rewrite from step 3).
+- **Rerankers:** `BAAI/bge-reranker-v2-m3` (0.6B, multilingual) and, as a small baseline, `cross-encoder/mmarco-mMiniLMv2-L12-H384-v1` (0.1B, trained on mMARCO, which has no Turkish). Both score (original question, chunk) pairs with max length 512, so a 192-word chunk is not cut.
+- **Adoption rule:** a reranker goes into the pipeline only if it raises R@5 on all 50 questions by at least 0.06 (3 questions). R@5 is what the answer model sees.
+- **Check:** the no-rerank rows reproduce `results/rewrite_v1_per_question.csv` for every question.
+
+Code: `scripts/reranker.py`, `scripts/eval_rerank.py`. Raw numbers in `results/rerank_v1_*`.
+
+## Results (50 q)
+
+| System | R@1 | R@3 | R@5 | R@10 | R@30 (ceiling) |
+|---|---|---|---|---|---|
+| orig | 0.38 | 0.56 | 0.64 | 0.73 | 0.87 |
+| orig + mmarco | 0.42 | 0.62 | 0.70 | 0.74 | 0.87 |
+| orig + bge | 0.50 | 0.69 | 0.81 | 0.83 | 0.87 |
+| fuse | 0.47 | 0.67 | 0.71 | 0.81 | 0.96 |
+| fuse + mmarco | 0.44 | 0.66 | 0.76 | 0.78 | 0.96 |
+| fuse + bge | 0.52 | 0.73 | 0.80 | 0.88 | 0.96 |
+
+At R@5, `orig + bge` gains 10 questions and loses 1 (q020); `fuse + bge` gains 7 and loses 2 (q017, q020).
+
+## Findings
+
+- `bge-reranker-v2-m3` passes the adoption rule on both candidate sets (+0.17 on `orig`, +0.09 on `fuse`). The small mMARCO model does not on `fuse` (+0.05) and loses questions the hybrid already had (q006, q042).
+- With the reranker, the LLM rewrite adds little at the top: `orig + bge` and `fuse + bge` are tied at R@5 (0.81 and 0.80). The rewrite still widens the candidate pool (R@30 0.87 to 0.96), which shows at R@10 (0.83 against 0.88).
+- `orig + bge` reaches 0.81 at R@5 without any LLM call, against 0.71 for `fuse`, the step 3 system.
+- Cost: on CPU (no GPU), bge took 1012 s for 50 questions, about 20 s per question for ~40 distinct candidates. mMARCO took 96 s. That is too slow for serving as it is.
+
+## Limitations
+
+- The setup and the adoption rule were fixed before the run and nothing was tuned, but `fuse` itself was chosen on these 50 questions in step 3.
+- Retrieval only. The answer quality with the reranked chunks has not been measured yet.
+
 Roadmap: see docs/ROADMAP.md
