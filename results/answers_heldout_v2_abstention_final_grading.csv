@@ -1,0 +1,21 @@
+﻿id,question,answer,expected,citation_check,grade,note
+a011,Müşteri verileriyle kendi yapay zeka modelimizi eğitebilir miyiz?,"Metinlerde müşteri verileriyle yapay zeka modeli eğitilmesine ilişkin somut bir durum ayrıca düzenlenmemiştir. 
+
+Kişisel verilerin işlenmesine ilişkin genel hükümlere göre:
+* Kişisel veriler ancak ilgili kanuni şartların (örneğin bir sözleşmenin kurulması veya ifası için gerekli olması, veri sorumlusunun hukuki yükümlülüğü, verinin ilgili kişi tarafından alenileştirilmiş olması, bir hakkın tesisi veya ilgili kişinin temel hak ve özgürlüklerine zarar vermemek kaydıyla meşru menfaat için zorunlu olması) varlığı hâlinde işlenebilir [kvkk_kanun_6698, Madde 5].
+* Özel nitelikli kişisel verilerin işlenmesi kural olarak yasaktır; ancak açık rıza, kanunlarda açıkça öngörülme veya alenileştirilmiş olma gibi sınırlı hâllerde işlenebilir [kvkk_kanun_6698, Madde 6].
+* Veri sorumluları ile veri işleyen kişiler, kişisel verileri işleme amacı dışında kullanamazlar [kvkk_kanun_6698, Madde 12].
+* İlgili kişi, verilerinin münhasıran otomatik sistemler vasıtasıyla analiz edilmesi suretiyle kendisi aleyhine bir sonucun ortaya çıkmasına itiraz etme hakkına sahiptir [kvkk_kanun_6698, Madde 11].","bilgi yok, ya da genel işleme şartlarını aktarıp yapay zekanın ayrıca düzenlenmediğini söylemesi; 'eğitebilirsiniz' gibi bir sonuç çıkarması uydurma",n/a,,
+a012,Verileri ABD'deki bir sunucuya taşımak için yeterlilik kararı var mı?,"Kişisel verilerin, Kanunun 5 inci ve 6 ncı maddelerinde belirtilen şartlardan birinin varlığı ve aktarımın yapılacağı ülke, ülke içerisindeki sektörler veya uluslararası kuruluşlar hakkında Kurul tarafından verilmiş bir yeterlilik kararı bulunması halinde yurt dışına aktarılabileceği düzenlenmiştir [kvkk_kanun_6698, Madde 9]. Yeterlilik kararı Kurul tarafından verilir ve Resmî Gazete’de yayımlanır [kvkk_kanun_6698, Madde 9].
+
+Verilen metinlerde ABD hakkında bir yeterlilik kararı bulunup bulunmadığına ilişkin somut bir bilgi yer almamaktadır.",Md. 9'daki yeterlilik kararı şartını aktarıp ABD için bir karar olup olmadığının metinlerde yazmadığını söylemesi; 'var' ya da 'yok' demesi uydurma,n/a,,
+a013,Çalışanların kişisel sosyal medya hesaplarını takip etmemiz yasal mı?,Bu konuda verilen metinlerde bilgi yok.,"bilgi yok, ya da genel kuralları aktarıp sosyal medyanın ayrıca düzenlenmediğini söylemesi",n/a,correct,
+a014,Çalışanlara yılda kaç saat KVKK eğitimi vermemiz gerekiyor?,"Verilen metinlerde çalışanlara yılda kaç saat eğitim verilmesi gerektiğine dair somut bir süre veya saat bilgisi düzenlenmemiştir.
+
+Metinlerde konuya ilişkin olarak; çalışanların kişisel verilerin hukuka aykırı olarak açıklanmaması ve paylaşılmaması gibi konularda eğitim almaları [rehber_veri_guvenligi, 2.2], politika ve prosedürlerde önemli değişiklikler olması durumunda yeni eğitimlerin yapılması [rehber_veri_guvenligi, 2.2] ve özel nitelikli kişisel verilerin işlenmesi süreçlerinde yer alan çalışanlara kanun, yönetmelikler ve veri güvenliği konularında düzenli olarak eğitimler verilmesi [rehber_ozel_nitelikli, 3.5] gerektiği belirtilmektedir.",Eğitim verilmesi gerektiğini aktarıp süre olmadığını söylemesi; bir saat sayısı vermesi uydurma,n/a,,
+a015,Şirket içi WhatsApp grubunda müşteri bilgisi paylaşmak yasak mı?,"Metinlerde şirket içi WhatsApp grubunda müşteri bilgisi paylaşılması gibi somut bir araç veya durum ayrıca düzenlenmemiştir.
+
+Ancak konuyu kapsayan genel hükümlere göre:
+* Veri sorumluları ile veri işleyen kişiler, öğrendikleri kişisel verileri Kanun hükümlerine aykırı olarak başkasına açıklayamaz ve işleme amacı dışında kullanamazlar [kvkk_kanun_6698, Madde 12].
+* Veri sorumlusu; kişisel verilerin hukuka aykırı olarak işlenmesini ve kişisel verilere hukuka aykırı olarak erişilmesini önlemek ile muhafazasını sağlamak amacıyla uygun güvenlik düzeyini temin etmeye yönelik gerekli her türlü teknik ve idari tedbirleri almak zorundadır [kvkk_kanun_6698, Madde 12].
+* Kişisel veriler, ilgili kişinin açık rızası olmaksızın aktarılamaz; Kanun'un 5 inci maddesinin ikinci fıkrasında veya yeterli önlemler alınmak kaydıyla 6 ncı maddesinin üçüncü fıkrasında belirtilen şartlardan birinin bulunması hâlinde açık rıza aranmaksızın aktarılabilir [kvkk_kanun_6698, Madde 8].","bilgi yok, ya da genel güvenlik kurallarını aktarıp WhatsApp'ın ayrıca düzenlenmediğini söylemesi",n/a,,

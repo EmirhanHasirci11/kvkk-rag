@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-06T14:08:01",
+  "commit": "b364e42c7156200c90590dc52e18127497de70eb",
+  "questions": [
+    "eval/test_v2.jsonl",
+    "eval/abstention_v2.jsonl"
+  ],
+  "final": {
+    "rewrite": true,
+    "rerank": true,
+    "stem": "snow",
+    "prompt": "v1"
+  },
+  "baseline": {
+    "rewrite": false,
+    "rerank": false,
+    "stem": "prefix5",
+    "prompt": "v0"
+  },
+  "systems": [
+    "orig",
+    "rw-only",
+    "fuse",
+    "orig+bge",
+    "fuse+bge",
+    "fuse+bge+snow (final)"
+  ]
+}

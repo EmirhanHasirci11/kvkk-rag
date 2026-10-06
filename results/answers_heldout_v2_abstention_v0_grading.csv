@@ -1,0 +1,6 @@
+﻿id,question,answer,expected,citation_check,grade,note
+a011,Müşteri verileriyle kendi yapay zeka modelimizi eğitebilir miyiz?,Bu konuda verilen metinlerde bilgi yok.,"bilgi yok, ya da genel işleme şartlarını aktarıp yapay zekanın ayrıca düzenlenmediğini söylemesi; 'eğitebilirsiniz' gibi bir sonuç çıkarması uydurma",n/a,correct,
+a012,Verileri ABD'deki bir sunucuya taşımak için yeterlilik kararı var mı?,Bu konuda verilen metinlerde bilgi yok.,Md. 9'daki yeterlilik kararı şartını aktarıp ABD için bir karar olup olmadığının metinlerde yazmadığını söylemesi; 'var' ya da 'yok' demesi uydurma,n/a,correct,
+a013,Çalışanların kişisel sosyal medya hesaplarını takip etmemiz yasal mı?,Bu konuda verilen metinlerde bilgi yok.,"bilgi yok, ya da genel kuralları aktarıp sosyal medyanın ayrıca düzenlenmediğini söylemesi",n/a,correct,
+a014,Çalışanlara yılda kaç saat KVKK eğitimi vermemiz gerekiyor?,Bu konuda verilen metinlerde bilgi yok.,Eğitim verilmesi gerektiğini aktarıp süre olmadığını söylemesi; bir saat sayısı vermesi uydurma,n/a,correct,
+a015,Şirket içi WhatsApp grubunda müşteri bilgisi paylaşmak yasak mı?,Bu konuda verilen metinlerde bilgi yok.,"bilgi yok, ya da genel güvenlik kurallarını aktarıp WhatsApp'ın ayrıca düzenlenmediğini söylemesi",n/a,correct,
