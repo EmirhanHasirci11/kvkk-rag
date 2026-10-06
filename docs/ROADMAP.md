@@ -2,6 +2,12 @@
 - Corpus extraction (5 KVKK texts), golden set (50 q), check_golden
 - Retrieval eval: chunking, e5 / tr embeddings, BM25 from scratch + prefix5, RRF hybrid
 - Held-out test (20 q), chosen setup: hyb-e5+bm25 (BM25 side = bm25-prefix5), 192/48, depth 50
+- Step 1 Generation v0: gemini-3.8-flash, chunk metadata, answer.py, run_answers.py (v0: 33/50)
+- Step 2 Answer evaluation: user grading, citation check, abstention set (10 q)
+- Step 3 Query rewriting: fuse (question + rewrite) (v1: 35/50); prompt v1 (v2: 43/50)
+- Step 4 Reranker: bge-reranker-v2-m3 on the top-30 (v3: 47/50)
+- Step 5 Stemming: bm25-snow replaces bm25-p5 (v4: 49/50)
+- Step 6 prepared: scripts/run_heldout.py freezes v4 and the v0 baseline; waiting for the new questions
 
 ## Next steps (in order)
 1. Generation v0
