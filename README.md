@@ -1,3 +1,79 @@
+# kvkk-rag
+
+A Turkish question-answering system over Turkish data protection law (KVKK): five official texts, a hybrid retriever, a reranker, and an LLM that answers only from the retrieved passages and cites the article for every claim. Every step was measured on a hand-written question set, and the final system was tested once on questions it had never seen.
+
+**Final pipeline:** question -> LLM rewrite into legal wording -> e5 dense + BM25 (Snowball stemmer) for the question and the rewrite, fused with RRF, top-30 -> `bge-reranker-v2-m3` -> top-5 chunks -> `gemini-3.8-flash` -> Turkish answer with `[doc, Madde n]` citations, or "Bu konuda verilen metinlerde bilgi yok." Served with FastAPI; the chunk embeddings can live in Postgres with pgvector.
+
+## Results at a glance
+
+| | Baseline (v0) | Final (v4) |
+|---|---|---|
+| Held-out, 20 new questions, correct | 9 / 20 | 12 / 20 |
+| Held-out, correct when the evidence was retrieved | | 11 / 11 |
+| Out-of-corpus questions, invented answers (10 seen + 5 new) | 0 / 15 | 0 / 15 |
+| Golden set, 50 questions used to build the system, correct | 33 / 50 | 49 / 50 |
+| Latency p50 / cost per question | | 19 s / $0.0087 |
+
+The golden-set number is optimistic, because the system was tuned on those questions; the held-out number is the honest one. On new questions every wrong answer is a retrieval miss. Answers were graded by hand (correct / partial / wrong).
+
+## Contents
+
+1. [Corpus](#corpus): the five texts and how the PDFs were cleaned
+2. [Retrieval results](#retrieval-results): chunking, embeddings, BM25 from scratch, hybrid search, the first held-out test
+3. [Generation results](#generation-results): answers with citations, grading, citation check, out-of-corpus questions
+4. [Query rewriting](#query-rewriting), [Prompt v1](#prompt-v1), [Reranker](#reranker), [Stemming](#stemming): one change at a time, each with a rule fixed before the run
+5. [Final held-out test](#final-held-out-test): the frozen pipeline against the baseline on 25 new questions
+6. [Serving](#serving): API, latency and cost, pgvector
+
+The plan and the project rules are in `docs/ROADMAP.md`.
+
+## Quickstart
+
+Python 3.11 or newer (developed on 3.13). A GPU is optional; the reranker takes about 0.7 s per question on an RTX 3080 and about 20 s on CPU.
+
+```
+python -m venv .venv
+.venv\Scripts\activate            # Linux / macOS: source .venv/bin/activate
+pip install -r requirements.txt
+# for an NVIDIA GPU, install the CUDA build of torch afterwards (see the comment in requirements.txt)
+```
+
+The cleaned corpus is in the repo (`corpus/text/`), so the PDFs are not needed. The embedding and reranker models are downloaded from Hugging Face on first use.
+
+LLM calls need a Gemini API key in `.env` at the repo root (it is git-ignored and is the only place the key is read from):
+
+```
+GEMINI_API_KEY=...
+```
+
+Use a paid-tier key: on the free tier, Google may use the requests for training. Every call is logged to `results/llm_usage.csv`, and `scripts/llm.py` refuses calls once the logged total reaches `BUDGET_USD` ($8).
+
+```
+python -m pytest tests -v                      # 34 tests, no LLM call
+
+# one question through the final pipeline (two LLM calls, about $0.009)
+python scripts/answer.py "Sitemiz hacklendi, kime haber vermeliyiz?" --rewrite --rerank --stem snow --prompt v1
+
+# the API
+uvicorn serve:app --app-dir scripts --port 8000
+curl -X POST localhost:8000/ask -H "Content-Type: application/json" -d '{"question": "Açık rıza nedir?"}'
+
+# pgvector backend (Docker)
+docker compose up -d
+python scripts/check_pgvector.py               # same top-5 as numpy for all 85 questions, no LLM call
+# serve with pgvector: set KVKK_DENSE=pgvector before uvicorn
+#   PowerShell: $env:KVKK_DENSE = "pgvector"    cmd: set KVKK_DENSE=pgvector    Linux / macOS: export KVKK_DENSE=pgvector
+```
+
+`python scripts/answer.py "..."` without flags runs the v0 baseline. The evaluation scripts (`eval_*.py`, `run_answers.py`, `run_heldout.py`, `bench_serving.py`) describe their arguments and cost in their docstrings; results go to new versioned files in `results/` and never overwrite old ones.
+
+## Project rules
+
+- Never change settings after looking at a held-out result.
+- Save each run as a new versioned file in `results/`.
+- When code moves, old numbers must reproduce exactly before new runs.
+- One question is noise: with 50 questions, gains of 2-5 points are not claimed as wins.
+
 # Corpus
 
 Official Turkish data protection texts used for retrieval experiments. About 22,000 words from 150 PDF pages.
