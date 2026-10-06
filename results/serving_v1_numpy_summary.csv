@@ -1,0 +1,9 @@
+stage,p50,p95,mean
+rewrite_ms,9379.0,10540.0,9319.0
+retrieval_ms,75.0,86.0,76.0
+rerank_ms,680.0,747.0,686.0
+generation_ms,8193.0,20675.0,9931.0
+total_ms,19238.0,30205.0,20013.0
+http_ms,19240.0,30206.0,20016.0
+cost_usd_per_question,0.00758,0.01359,0.00871
+startup_s,15.5,,

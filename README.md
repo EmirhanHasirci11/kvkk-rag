@@ -410,4 +410,42 @@ On the 5 new abstention questions the final system says "bilgi yok" once and quo
 - 12 of the 20 evidence sentences come from the special-category guide, because most unused sentences are there; the communiqué has none.
 - By the project rule, nothing is changed after this result. `rw-only` looking better here is a finding for the next version, which would need its own new held-out set.
 
+
+# Serving
+
+## Setup
+
+- **API:** `scripts/serve.py` (FastAPI). `POST /ask {"question": ...}` returns the answer, its citations, the five source chunks (doc and article / section), the rewrite, tokens, cost and per-stage timings; `GET /health` reports readiness and the budget. One request at a time, since the models share one GPU.
+- **Pipeline:** `scripts/pipeline.py`, the frozen final system (v4). With the cached rewrites it returns the same top-5 as `results/answers_v4.jsonl` for all 50 golden questions.
+- **pgvector:** `docker-compose.yml` runs Postgres with pgvector; `scripts/pgstore.py` stores the chunk embeddings and searches them by cosine distance (`KVKK_DENSE=pgvector`). The table is rebuilt only when the chunks or the model change. The default dense backend stays in-memory numpy.
+- **Hardware:** RTX 3080 for e5 and the reranker; the LLM is the Gemini API.
+
+```
+uvicorn serve:app --app-dir scripts --port 8000
+curl -X POST localhost:8000/ask -H "Content-Type: application/json" -d '{"question": "Açık rıza nedir?"}'
+```
+
+## Latency and cost (numpy backend, 10 golden questions)
+
+From `results/serving_v1_numpy_summary.csv`, written by `scripts/bench_serving.py` (in-process HTTP, one request at a time, after a warm-up).
+
+| Stage | p50 (ms) | p95 (ms) | mean (ms) |
+|---|---|---|---|
+| LLM rewrite | 9,379 | 10,540 | 9,319 |
+| Retrieval (e5 + BM25 + RRF, 2 queries) | 75 | 86 | 76 |
+| Rerank (bge, 30 candidates) | 680 | 747 | 686 |
+| LLM answer | 8,193 | 20,675 | 9,931 |
+| Total | 19,238 | 30,205 | 20,013 |
+
+Cost: $0.0076 per question at p50, $0.0087 on average (rewrite + answer, thinking tokens included). Startup: 15.5 s (chunking, embedding the corpus, loading both models).
+
+## Findings
+
+- Almost all the latency is the two LLM calls. Retrieval and reranking together take under 0.8 s.
+- The rewrite takes as long as the answer, although its output is one or two sentences; most of it is the model's default thinking. Turning thinking down would cut the latency, but it changes the rewrites, so it needs its own evaluation.
+
+## Not done yet
+
+- The pgvector backend is written but not measured: Docker Desktop on this machine needs WSL 2, which is not installed yet. When it runs, the check is that the pgvector dense rankings reproduce the numpy ones for every question, then the same latency table with `--dense pgvector`.
+
 Roadmap: see docs/ROADMAP.md

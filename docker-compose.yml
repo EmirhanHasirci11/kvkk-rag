@@ -1,0 +1,21 @@
+# Postgres with pgvector for the chunk embeddings (scripts/pgstore.py).
+# Local development only: the password is not a secret, and the port is bound to localhost.
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: kvkk
+      POSTGRES_PASSWORD: kvkk
+      POSTGRES_DB: kvkk
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kvkk -d kvkk"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  pgdata:

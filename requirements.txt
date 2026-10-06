@@ -21,6 +21,13 @@ zeyrek
 google-genai
 python-dotenv
 
+# serving (scripts/serve.py, scripts/pgstore.py); httpx is for the FastAPI test client
+fastapi
+uvicorn
+psycopg[binary]
+pgvector
+httpx
+
 # notebook
 ipykernel
 ipywidgets
